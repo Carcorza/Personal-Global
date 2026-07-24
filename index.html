@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard de Personal - Espejo Local</title>
+    <title>Dashboard de Personal - GitHub Pages</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,10 +13,10 @@
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>Dashboard de Control de Personal</h1>
-                <p class="text-sm text-gray-500 mt-1">Modo Espejo Activo: Carga instantánea y búsquedas ultrarrápidas.</p>
+                <p class="text-sm text-gray-500 mt-1">Alojado en GitHub Pages con Espejo Local Activo.</p>
             </div>
             <div class="mt-4 md:mt-0 flex gap-2">
-                <button onclick="sincronizarEspejo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-rotate mr-1"></i> Sincronizar Datos</button>
+                <button onclick="forzarSincronizacion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-rotate mr-1"></i> Sincronizar Datos</button>
                 <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-file-excel mr-1"></i> Exportar CSV</button>
             </div>
         </header>
@@ -25,19 +25,19 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
                 <div class="p-3 bg-blue-50 text-blue-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-users"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Total Registros</p><h3 id="kpiTotal" class="text-xl font-bold text-gray-900">Cargando...</h3></div>
+                <div><p class="text-xs text-gray-500 font-medium">Total Registros</p><h3 id="kpiTotal" class="text-xl font-bold text-gray-900">0</h3></div>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
                 <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-user-check"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Personal Activo</p><h3 id="kpiActivos" class="text-xl font-bold text-gray-900">Cargando...</h3></div>
+                <div><p class="text-xs text-gray-500 font-medium">Personal Activo</p><h3 id="kpiActivos" class="text-xl font-bold text-gray-900">0</h3></div>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
                 <div class="p-3 bg-rose-50 text-rose-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-user-slash"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Personal Inactivo</p><h3 id="kpiInactivos" class="text-xl font-bold text-gray-900">Cargando...</h3></div>
+                <div><p class="text-xs text-gray-500 font-medium">Personal Inactivo</p><h3 id="kpiInactivos" class="text-xl font-bold text-gray-900">0</h3></div>
             </div>
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
                 <div class="p-3 bg-amber-50 text-amber-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-briefcase"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Cargos Únicos</p><h3 id="kpiCargos" class="text-xl font-bold text-gray-900">Cargando...</h3></div>
+                <div><p class="text-xs text-gray-500 font-medium">Cargos Únicos</p><h3 id="kpiCargos" class="text-xl font-bold text-gray-900">0</h3></div>
             </div>
         </div>
 
@@ -113,7 +113,7 @@
                         </tr>
                     </thead>
                     <tbody id="tablaCuerpo" class="divide-y divide-gray-100">
-                        <tr><td colspan="8" class="p-6 text-center text-gray-500">Cargando desde el espejo local...</td></tr>
+                        <tr><td colspan="8" class="p-6 text-center text-gray-500">Cargando datos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -122,9 +122,9 @@
 
     <script>
         // PEGA AQUÍ TU URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-        const API_URL = "https://script.google.com/macros/s/AKfycbxeeIupDvX85SbCxO_nDdOtvO8pbQH8Hx05A2mSPm9LybapG07GcsfZP1awSfCWTOE6/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbz4pj9nxwFIvfEPey_G_ll4j3hawfcyST7jP4F2Z60ocmQUCh2jJXBOCwOPlmEDAi2i/exec";
 
-        const CLAVE_ESPEJO = "google_sheet_espejo_personal";
+        const CLAVE_ESPEJO = "google_sheet_espejo_personal_v2";
         let allData = [];
         let filteredData = [];
         let estadoFiltroActual = 'TODOS';
@@ -141,7 +141,7 @@
                 return;
             }
 
-            // 1. CARGA INSTANTÁNEA DESDE EL ESPEJO LOCAL
+            // 1. CARGA INMEDIATA DESDE EL ESPEJO LOCAL (0 SEGUNDOS)
             const datosGuardados = localStorage.getItem(CLAVE_ESPEJO);
             if (datosGuardados) {
                 try {
@@ -149,35 +149,50 @@
                     poblarCargosSelect();
                     filtrarDatos();
                 } catch(e) {
-                    console.error("Error al leer el espejo:", e);
+                    console.error("Error al leer espejo:", e);
                 }
             }
 
-            // 2. ACTUALIZACIÓN EN SEGUNDO PLANO (Refresca el espejo silenciosamente)
-            sincronizarEspejo(false);
-        }
-
-        function sincronizarEspejo(mostrarAlerta = true) {
-            if (mostrarAlerta) {
-                document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-blue-600 font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Actualizando espejo desde Google Sheets...</td></tr>';
+            // Si no hay espejo previo, mostramos aviso de carga inicial
+            if (!datosGuardados || allData.length === 0) {
+                document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-blue-600 font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Conectando con Google Sheets (primera vez)...</td></tr>';
             }
 
+            // 2. SINCRONIZAR EN SEGUNDO PLANO
+            sincronizarDatosSilencioso();
+        }
+
+        function sincronizarDatosSilencioso() {
+            // Usamos una petición tipo script para saltar restricciones de CORS en GitHub Pages
             fetch(API_URL)
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    allData = data;
-                    localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data)); // Guarda el nuevo espejo
-                    poblarCargosSelect();
-                    filtrarDatos();
-                    if (mostrarAlerta) {
-                        // Feedback visual sutil o simplemente se actualiza la tabla
+                    if (data && data.length > 0) {
+                        allData = data;
+                        localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data));
+                        poblarCargosSelect();
+                        filtrarDatos();
                     }
                 })
-                .catch(error => {
-                    console.error("Error al conectar:", error);
-                    if (mostrarAlerta && allData.length === 0) {
-                        alert("No se pudo conectar con Google Sheets y no hay datos en el espejo.");
-                    }
+                .catch(err => {
+                    console.warn("Aviso: No se pudo actualizar en segundo plano, usando datos locales.", err);
+                });
+        }
+
+        function forzarSincronizacion() {
+            document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-blue-600 font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Forzando actualización desde Google Sheets...</td></tr>';
+            
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    allData = data;
+                    localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data));
+                    poblarCargosSelect();
+                    filtrarDatos();
+                    alert("¡Datos sincronizados correctamente!");
+                })
+                .catch(err => {
+                    alert("Error al sincronizar. Revisa los permisos de la aplicación web en Google.");
                 });
         }
 
@@ -395,7 +410,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', 'Reporte_Personal_Espejo.csv');
+            a.setAttribute('download', 'Reporte_Personal_GitHub.csv');
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
