@@ -6,8 +6,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animación suave para el logo giratorio */
+        @keyframes girar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-girar-lento {
+            animation: girar 2s linear infinite;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- PANTALLA DE CARGA CON IMAGEN GIRATORIA -->
+    <div id="pantallaCarga" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex flex-col items-center">
+            <!-- Imagen de Google Drive con animación de giro -->
+            <img src="https://lh3.googleusercontent.com/d/17JZ5EQHX9VgU_jgYNIf5dZQjPl5IHGJu" alt="Cargando..." class="w-24 h-24 object-contain animate-girar-lento mb-4">
+            <h2 class="text-lg font-bold text-gray-800 tracking-wide">Cargando Dashboard...</h2>
+            <p class="text-xs text-gray-500 mt-1">Sincronizando información de personal, por favor espere.</p>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL DEL DASHBOARD -->
     <div class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- Header -->
         <header class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -135,35 +157,39 @@
             inicializarDashboard();
         };
 
+        function ocultarPantallaCarga() {
+            const pantalla = document.getElementById('pantallaCarga');
+            if (pantalla) {
+                pantalla.style.opacity = '0';
+                setTimeout(() => { pantalla.style.display = 'none'; }, 500);
+            }
+        }
+
         function inicializarDashboard() {
             if (API_URL.includes("TU_URL")) {
                 alert("Por favor configura la variable API_URL con tu enlace de Google Apps Script.");
+                ocultarPantallaCarga();
                 return;
             }
 
-            // 1. CARGA INMEDIATA DESDE EL ESPEJO LOCAL (0 SEGUNDOS)
+            // 1. CARGA INMEDIATA DESDE EL ESPEJO LOCAL
             const datosGuardados = localStorage.getItem(CLAVE_ESPEJO);
             if (datosGuardados) {
                 try {
                     allData = JSON.parse(datosGuardados);
                     poblarCargosSelect();
                     filtrarDatos();
+                    ocultarPantallaCarga(); // Oculta la pantalla de carga rápido si hay espejo
                 } catch(e) {
                     console.error("Error al leer espejo:", e);
                 }
             }
 
-            // Si no hay espejo previo, mostramos aviso de carga inicial
-            if (!datosGuardados || allData.length === 0) {
-                document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-blue-600 font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Conectando con Google Sheets (primera vez)...</td></tr>';
-            }
-
-            // 2. SINCRONIZAR EN SEGUNDO PLANO
-            sincronizarDatosSilencioso();
+            // 2. SINCRONIZAR EN SEGUNDO PLANO O CARGAR INICIAL
+            sincronizarDatosSilencioso(!datosGuardados);
         }
 
-        function sincronizarDatosSilencioso() {
-            // Usamos una petición tipo script para saltar restricciones de CORS en GitHub Pages
+        function sincronizarDatosSilencioso(mostrarCargaSiNoHayDatos) {
             fetch(API_URL)
                 .then(res => res.json())
                 .then(data => {
@@ -173,14 +199,18 @@
                         poblarCargosSelect();
                         filtrarDatos();
                     }
+                    ocultarPantallaCarga();
                 })
                 .catch(err => {
                     console.warn("Aviso: No se pudo actualizar en segundo plano, usando datos locales.", err);
+                    ocultarPantallaCarga();
                 });
         }
 
         function forzarSincronizacion() {
-            document.getElementById('tablaCuerpo').innerHTML = '<tr><td colspan="8" class="p-6 text-center text-blue-600 font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Forzando actualización desde Google Sheets...</td></tr>';
+            const pantalla = document.getElementById('pantallaCarga');
+            pantalla.style.display = 'flex';
+            pantalla.style.opacity = '1';
             
             fetch(API_URL)
                 .then(res => res.json())
@@ -189,9 +219,11 @@
                     localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data));
                     poblarCargosSelect();
                     filtrarDatos();
+                    ocultarPantallaCarga();
                     alert("¡Datos sincronizados correctamente!");
                 })
                 .catch(err => {
+                    ocultarPantallaCarga();
                     alert("Error al sincronizar. Revisa los permisos de la aplicación web en Google.");
                 });
         }
