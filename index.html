@@ -321,16 +321,21 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA NUEVA: PERSONAL PENDIENTE (TIPO TABLA DINÁMICA) -->
+                <!-- PESTAÑA NUEVA: PERSONAL PENDIENTE (CON OPCIÓN DE VER CON/SIN CIUDAD) -->
                 <div id="content-pendientes" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex flex-wrap justify-between items-center gap-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base">Informe de Necesidad - Personal Pendiente (P_PEND)</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Agrupado por Área y Cargo en formato de tabla dinámica interactiva.</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Alterna la vista para incluir o excluir el desglose por ciudad.</p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span id="pendTotalBadge" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-bold border border-indigo-100">Total General: 0</span>
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <!-- Botón selector de vista con/sin ciudad -->
+                                <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 text-xs font-medium">
+                                    <button id="btnModoSinCiudad" onclick="cambiarModoCiudad(false)" class="px-3 py-1.5 rounded-lg transition bg-white text-slate-800 shadow-sm">Sin Ciudad</button>
+                                    <button id="btnModoConCiudad" onclick="cambiarModoCiudad(true)" class="px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">Con Ciudad</button>
+                                </div>
+                                <span id="pendTotalBadge" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-lg font-bold border border-indigo-100">Total General: 0</span>
                                 <button onclick="exportarPendientesExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
                                     📊 Exportar Tabla a Excel
                                 </button>
@@ -341,11 +346,8 @@
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto max-h-[600px]">
                             <table class="w-full text-left border-collapse sticky top-0">
-                                <thead class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-3.5">Etiquetas de fila (Área / Cargo)</th>
-                                        <th class="px-6 py-3.5 text-right">Cuenta de CARGO (Necesidad)</th>
-                                    </tr>
+                                <thead id="pendTableHead" class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
+                                    <!-- Se genera dinámicamente según el modo -->
                                 </thead>
                                 <tbody id="pendTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
                                     <tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">Cargando datos de P_PEND...</td></tr>
@@ -509,6 +511,7 @@
 
         let rawData = [];
         let pendData = []; // Datos de la pestaña P_Pend
+        let mostrarConCiudad = false; // Estado inicial: Sin Ciudad
         let permisosActuales = {};
         let currentDynamicFiltered = [];
         let currentExportFiltered = [];
@@ -863,7 +866,6 @@
                     }
                 });
                 
-                // Siempre permitimos acceso a 'pendientes' ya que el usuario lo solicita explícitamente en el menú
                 if(tab.id === 'pendientes' || tienePermiso) {
                     if(!primeraTabHabilitada) primeraTabHabilitada = tab.id;
 
@@ -1004,7 +1006,6 @@
             }
         };
 
-        // Función para cargar datos de la pestaña P_Pend[cite: 1]
         function fetchPendData() {
             const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=P_Pend&tqx=responseHandler:handlePendData`;
             const script = document.createElement('script');
@@ -1039,11 +1040,11 @@
                     return obj;
                 });
 
-                // Normalizar nombres de columnas comunes (AREA, CARGO)
                 pendData = pendData.map(item => ({
+                    cargo: item["CARGO"] || "SIN CARGO",
                     area: item["AREA"] || item["DEPENDENCIA"] || item["DEPENDENCIA CARGO"] || "SIN ÁREA",
-                    cargo: item["CARGO"] || "SIN CARGO"
-                })).filter(item => item.area !== "" || item.cargo !== "");
+                    city: item["CIUDAD"] || "SIN CIUDAD"
+                })).filter(item => item.cargo !== "" || item.area !== "");
 
                 renderPendientesTable();
             } catch (error) {
@@ -1053,9 +1054,33 @@
             }
         };
 
+        function cambiarModoCiudad(conCiudad) {
+            mostrarConCiudad = conCiudad;
+            const btnSin = document.getElementById('btnModoSinCiudad');
+            const btnCon = document.getElementById('btnModoConCiudad');
+
+            if (conCiudad) {
+                btnCon.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-800 shadow-sm";
+                btnSin.className = "px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900";
+            } else {
+                btnSin.className = "px-3 py-1.5 rounded-lg transition bg-white text-slate-800 shadow-sm";
+                btnCon.className = "px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900";
+            }
+
+            renderPendientesTable();
+        }
+
         function renderPendientesTable() {
+            const thead = document.getElementById('pendTableHead');
             const tbody = document.getElementById('pendTableBody');
-            if(!tbody) return;
+            if(!tbody || !thead) return;
+
+            thead.innerHTML = `
+                <tr>
+                    <th class="px-6 py-3.5">${mostrarConCiudad ? 'Etiquetas de fila (Cargo / Área / Ciudad)' : 'Etiquetas de fila (Área / Cargo)'}</th>
+                    <th class="px-6 py-3.5 text-right">Cuenta de CARGO (Necesidad)</th>
+                </tr>
+            `;
             tbody.innerHTML = '';
 
             if (pendData.length === 0) {
@@ -1064,56 +1089,102 @@
                 return;
             }
 
-            // Agrupar por Área y luego por Cargo (simulando Tabla Dinámica)[cite: 1]
-            let agrupado = {};
             let totalGeneral = 0;
 
-            pendData.forEach(item => {
-                let area = (item.area || 'SIN ÁREA').toUpperCase();
-                let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+            if (!mostrarConCiudad) {
+                // MODO 1: SIN CIUDAD (Área -> Cargo)
+                let agrupado = {};
+                pendData.forEach(item => {
+                    let area = (item.area || 'SIN ÁREA').toUpperCase();
+                    let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
 
-                if (!agrupado[area]) {
-                    agrupado[area] = { cargos: {}, total: 0 };
-                }
-                if (!agrupado[area].cargos[cargo]) {
-                    agrupado[area].cargos[cargo] = 0;
-                }
-                agrupado[area].cargos[cargo]++;
-                agrupado[area].total++;
-                totalGeneral++;
-            });
+                    if (!agrupado[area]) agrupado[area] = { cargos: {}, total: 0 };
+                    if (!agrupado[area].cargos[cargo]) agrupado[area].cargos[cargo] = 0;
 
-            document.getElementById('pendTotalBadge').textContent = `Total General: ${totalGeneral}`;
+                    agrupado[area].cargos[cargo]++;
+                    agrupado[area].total++;
+                    totalGeneral++;
+                });
 
-            // Ordenar áreas alfabéticamente
-            let areasOrdenadas = Object.keys(agrupado).sort();
+                document.getElementById('pendTotalBadge').textContent = `Total General: ${totalGeneral}`;
+                let areasOrdenadas = Object.keys(agrupado).sort();
 
-            areasOrdenadas.forEach(area => {
-                // Fila del Área (Principal)
-                let trArea = document.createElement('tr');
-                trArea.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
-                trArea.innerHTML = `
-                    <td class="px-6 py-3 flex items-center gap-2">
-                        <span class="text-indigo-600">⊟</span> ${area}
-                    </td>
-                    <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[area].total}</td>
-                `;
-                tbody.appendChild(trArea);
+                areasOrdenadas.forEach(area => {
+                    let trArea = document.createElement('tr');
+                    trArea.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
+                    trArea.innerHTML = `
+                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-indigo-600">⊟</span> ${area}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[area].total}</td>
+                    `;
+                    tbody.appendChild(trArea);
 
-                // Ordenar cargos dentro del área alfabéticamente
-                let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
+                    let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
+                    cargosOrdenados.forEach(cargo => {
+                        let count = agrupado[area].cargos[cargo];
+                        let trCargo = document.createElement('tr');
+                        trCargo.className = "hover:bg-slate-50 transition border-b border-slate-100 text-slate-700";
+                        trCargo.innerHTML = `
+                            <td class="px-6 py-2.5 pl-12 text-slate-600 font-medium">↳ ${cargo}</td>
+                            <td class="px-6 py-2.5 text-right font-semibold text-slate-800">${count}</td>
+                        `;
+                        tbody.appendChild(trCargo);
+                    });
+                });
+
+            } else {
+                // MODO 2: CON CIUDAD (Cargo -> Área -> Ciudad)
+                let agrupado = {};
+                pendData.forEach(item => {
+                    let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+                    let area = (item.area || 'SIN ÁREA').toUpperCase();
+                    let city = (item.city || 'SIN CIUDAD').toUpperCase();
+
+                    if (!agrupado[cargo]) agrupado[cargo] = { areas: {}, total: 0 };
+                    if (!agrupado[cargo].areas[area]) agrupado[cargo].areas[area] = { cities: {}, total: 0 };
+                    if (!agrupado[cargo].areas[area].cities[city]) agrupado[cargo].areas[area].cities[city] = 0;
+
+                    agrupado[cargo].areas[area].cities[city]++;
+                    agrupado[cargo].areas[area].total++;
+                    agrupado[cargo].total++;
+                    totalGeneral++;
+                });
+
+                document.getElementById('pendTotalBadge').textContent = `Total General: ${totalGeneral}`;
+                let cargosOrdenados = Object.keys(agrupado).sort();
 
                 cargosOrdenados.forEach(cargo => {
-                    let count = agrupado[area].cargos[cargo];
                     let trCargo = document.createElement('tr');
-                    trCargo.className = "hover:bg-slate-50 transition border-b border-slate-100 text-slate-700";
+                    trCargo.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
                     trCargo.innerHTML = `
-                        <td class="px-6 py-2.5 pl-12 text-slate-600 font-medium">↳ ${cargo}</td>
-                        <td class="px-6 py-2.5 text-right font-semibold text-slate-800">${count}</td>
+                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-indigo-600">⊟</span> ${cargo}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[cargo].total}</td>
                     `;
                     tbody.appendChild(trCargo);
+
+                    let areasOrdenadas = Object.keys(agrupado[cargo].areas).sort();
+                    areasOrdenadas.forEach(area => {
+                        let trArea = document.createElement('tr');
+                        trArea.className = "bg-slate-50/80 font-semibold text-slate-800 border-b border-slate-100";
+                        trArea.innerHTML = `
+                            <td class="px-6 py-2.5 pl-10 flex items-center gap-1.5 text-slate-700"><span class="text-slate-400">↳</span> ${area}</td>
+                            <td class="px-6 py-2.5 text-right font-semibold text-slate-800">${agrupado[cargo].areas[area].total}</td>
+                        `;
+                        tbody.appendChild(trArea);
+
+                        let citiesOrdenadas = Object.keys(agrupado[cargo].areas[area].cities).sort();
+                        citiesOrdenadas.forEach(city => {
+                            let count = agrupado[cargo].areas[area].cities[city];
+                            let trCity = document.createElement('tr');
+                            trCity.className = "hover:bg-slate-50 transition border-b border-slate-100 text-slate-600";
+                            trCity.innerHTML = `
+                                <td class="px-6 py-2 pl-16 text-slate-500 text-[11px]">${city}</td>
+                                <td class="px-6 py-2 text-right font-medium text-slate-700">${count}</td>
+                            `;
+                            tbody.appendChild(trCity);
+                        });
+                    });
                 });
-            });
+            }
         }
 
         function exportarPendientesExcel() {
@@ -1122,31 +1193,62 @@
                 return;
             }
 
-            let agrupado = {};
             let totalGeneral = 0;
-            pendData.forEach(item => {
-                let area = (item.area || 'SIN ÁREA').toUpperCase();
-                let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
-                if (!agrupado[area]) agrupado[area] = { cargos: {}, total: 0 };
-                if (!agrupado[area].cargos[cargo]) agrupado[area].cargos[cargo] = 0;
-                agrupado[area].cargos[cargo]++;
-                agrupado[area].total++;
-                totalGeneral++;
-            });
+            let csvRows = [];
 
-            let csvRows = [['ETIQUETAS DE FILA (ÁREA / CARGO)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')];
-            let areasOrdenadas = Object.keys(agrupado).sort();
-
-            areasOrdenadas.forEach(area => {
-                csvRows.push([`"${area}"`, `"${agrupado[area].total}"`].join(','));
-                let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
-                cargosOrdenados.forEach(cargo => {
-                    csvRows.push([`"    ${cargo}"`, `"${agrupado[area].cargos[cargo]}"`].join(','));
+            if (!mostrarConCiudad) {
+                let agrupado = {};
+                pendData.forEach(item => {
+                    let area = (item.area || 'SIN ÁREA').toUpperCase();
+                    let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+                    if (!agrupado[area]) agrupado[area] = { cargos: {}, total: 0 };
+                    if (!agrupado[area].cargos[cargo]) agrupado[area].cargos[cargo] = 0;
+                    agrupado[area].cargos[cargo]++;
+                    agrupado[area].total++;
+                    totalGeneral++;
                 });
-            });
-            csvRows.push([`"Total general"`, `"${totalGeneral}"`].join(','));
 
-            downloadBlob(csvRows, 'Informe_Personal_Pendiente.csv');
+                csvRows.push([['ETIQUETAS DE FILA (ÁREA / CARGO)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')]);
+                let areasOrdenadas = Object.keys(agrupado).sort();
+                areasOrdenadas.forEach(area => {
+                    csvRows.push([`"${area}"`, `"${agrupado[area].total}"`].join(','));
+                    let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
+                    cargosOrdenados.forEach(cargo => {
+                        csvRows.push([`"    ${cargo}"`, `"${agrupado[area].cargos[cargo]}"`].join(','));
+                    });
+                });
+            } else {
+                let agrupado = {};
+                pendData.forEach(item => {
+                    let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+                    let area = (item.area || 'SIN ÁREA').toUpperCase();
+                    let city = (item.city || 'SIN CIUDAD').toUpperCase();
+                    if (!agrupado[cargo]) agrupado[cargo] = { areas: {}, total: 0 };
+                    if (!agrupado[cargo].areas[area]) agrupado[cargo].areas[area] = { cities: {}, total: 0 };
+                    if (!agrupado[cargo].areas[area].cities[city]) agrupado[cargo].areas[area].cities[city] = 0;
+                    agrupado[cargo].areas[area].cities[city]++;
+                    agrupado[cargo].areas[area].total++;
+                    agrupado[cargo].total++;
+                    totalGeneral++;
+                });
+
+                csvRows.push([['ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')]);
+                let cargosOrdenados = Object.keys(agrupado).sort();
+                cargosOrdenados.forEach(cargo => {
+                    csvRows.push([`"${cargo}"`, `"${agrupado[cargo].total}"`].join(','));
+                    let areasOrdenadas = Object.keys(agrupado[cargo].areas).sort();
+                    areasOrdenadas.forEach(area => {
+                        csvRows.push([`"    ${area}"`, `"${agrupado[cargo].areas[area].total}"`].join(','));
+                        let citiesOrdenadas = Object.keys(agrupado[cargo].areas[area].cities).sort();
+                        citiesOrdenadas.forEach(city => {
+                            csvRows.push([`"        ${city}"`, `"${agrupado[cargo].areas[area].cities[city]}"`].join(','));
+                        });
+                    });
+                });
+            }
+
+            csvRows.push([`"Total general"`, `"${totalGeneral}"`].join(','));
+            downloadBlob(csvRows, mostrarConCiudad ? 'Informe_Personal_Pendiente_Con_Ciudad.csv' : 'Informe_Personal_Pendiente_Sin_Ciudad.csv');
         }
 
         function initDropdowns() {
