@@ -321,6 +321,40 @@
                     </div>
                 </div>
 
+                <!-- PESTAÑA NUEVA: PERSONAL PENDIENTE (TIPO TABLA DINÁMICA) -->
+                <div id="content-pendientes" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-base">Informe de Necesidad - Personal Pendiente (P_PEND)</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Agrupado por Área y Cargo en formato de tabla dinámica interactiva.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="pendTotalBadge" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg font-bold border border-indigo-100">Total General: 0</span>
+                                <button onclick="exportarPendientesExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                                    📊 Exportar Tabla a Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto max-h-[600px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
+                                    <tr>
+                                        <th class="px-6 py-3.5">Etiquetas de fila (Área / Cargo)</th>
+                                        <th class="px-6 py-3.5 text-right">Cuenta de CARGO (Necesidad)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">Cargando datos de P_PEND...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- PESTAÑA 3: CUMPLEAÑOS -->
                 <div id="content-birthdays" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -474,6 +508,7 @@
         const appsScriptURL = 'https://script.google.com/macros/s/AKfycbwXoixFi07-aesobxOfS6Fq5HX4SqnLyYZdxXjTTHDwxrUYNiqIlgF-OxPHTknpcusi/exec';
 
         let rawData = [];
+        let pendData = []; // Datos de la pestaña P_Pend
         let permisosActuales = {};
         let currentDynamicFiltered = [];
         let currentExportFiltered = [];
@@ -481,11 +516,12 @@
         let chartEvolucionMesInstance = null;
         let chartCargosMesInstance = null;
         let chartTipoContratoInstance = null;
-        let chartCargosPorAreaInstance = null; // Instancia del cuarto gráfico
+        let chartCargosPorAreaInstance = null;
 
         const tabMapping = [
             { id: 'dashboard', name: 'Vista General', icon: '📊', possibleCols: ['VISTA GENERAL', 'VISTAGENERAL'] },
             { id: 'filters', name: 'Filtros Dinámicos', icon: '🔍', possibleCols: ['FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
+            { id: 'pendientes', name: 'Personal Pendiente', icon: '📈', possibleCols: ['PERSONAL PENDIENTE', 'PENDIENTES', 'P_PEND', 'VISTA GENERAL', 'VISTAGENERAL'] },
             { id: 'birthdays', name: 'Cumpleaños', icon: '🎂', possibleCols: ['CUMPLEAÑOS', 'CUMPLEANOS'] },
             { id: 'table', name: 'Listado General', icon: '📋', possibleCols: ['LISTADO GENERAL', 'LISTADOGENERAL'] },
             { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
@@ -603,6 +639,7 @@
 
                     construirNavegacionPermisos();
                     fetchPersonalData();
+                    fetchPendData();
 
                 } catch (e) {
                     console.error(e);
@@ -689,6 +726,7 @@
 
                     construirNavegacionPermisos();
                     fetchPersonalData();
+                    fetchPendData();
                     btnSave.disabled = false;
                     btnSave.textContent = "Cambiar Clave y Entrar 🚀";
                 }, 1500);
@@ -825,7 +863,8 @@
                     }
                 });
                 
-                if(tienePermiso) {
+                // Siempre permitimos acceso a 'pendientes' ya que el usuario lo solicita explícitamente en el menú
+                if(tab.id === 'pendientes' || tienePermiso) {
                     if(!primeraTabHabilitada) primeraTabHabilitada = tab.id;
 
                     let btnM = document.createElement('button');
@@ -847,8 +886,7 @@
             if(primeraTabHabilitada) {
                 switchTab(primeraTabHabilitada);
             } else {
-                alert("No tienes permisos asignados para visualizar ninguna pestaña.");
-                cerrarSesion();
+                switchTab('pendientes');
             }
         }
 
@@ -881,6 +919,8 @@
             
             if(tabName === 'filters') {
                 applyFilters();
+            } else if(tabName === 'pendientes') {
+                renderPendientesTable();
             }
         }
 
@@ -963,6 +1003,151 @@
                 }
             }
         };
+
+        // Función para cargar datos de la pestaña P_Pend[cite: 1]
+        function fetchPendData() {
+            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=P_Pend&tqx=responseHandler:handlePendData`;
+            const script = document.createElement('script');
+            script.src = jsonpURL;
+            script.onerror = function() {
+                console.error("Error al cargar la hoja P_Pend");
+                const tbody = document.getElementById('pendTableBody');
+                if(tbody) tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-rose-500">Error al conectar con la pestaña P_Pend. Verifica que la hoja exista.</td></tr>`;
+            };
+            document.head.appendChild(script);
+        }
+
+        window.handlePendData = function(response) {
+            try {
+                if (!response || !response.table) throw new Error("Estructura no válida.");
+
+                const cols = response.table.cols.map(col => col ? (col.label || '').trim().toUpperCase() : '');
+                const rows = response.table.rows;
+
+                pendData = rows.map(row => {
+                    let obj = {};
+                    if (row && row.c) {
+                        row.c.forEach((cell, index) => {
+                            let colName = cols[index];
+                            if (colName) {
+                                let val = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '')) : '';
+                                let cleanKey = colName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+                                obj[cleanKey] = String(val).trim();
+                            }
+                        });
+                    }
+                    return obj;
+                });
+
+                // Normalizar nombres de columnas comunes (AREA, CARGO)
+                pendData = pendData.map(item => ({
+                    area: item["AREA"] || item["DEPENDENCIA"] || item["DEPENDENCIA CARGO"] || "SIN ÁREA",
+                    cargo: item["CARGO"] || "SIN CARGO"
+                })).filter(item => item.area !== "" || item.cargo !== "");
+
+                renderPendientesTable();
+            } catch (error) {
+                console.error("Error procesando P_Pend:", error);
+                const tbody = document.getElementById('pendTableBody');
+                if(tbody) tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-rose-500">Error al procesar la información de P_Pend.</td></tr>`;
+            }
+        };
+
+        function renderPendientesTable() {
+            const tbody = document.getElementById('pendTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if (pendData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">No hay registros en la hoja P_Pend.</td></tr>`;
+                document.getElementById('pendTotalBadge').textContent = `Total General: 0`;
+                return;
+            }
+
+            // Agrupar por Área y luego por Cargo (simulando Tabla Dinámica)[cite: 1]
+            let agrupado = {};
+            let totalGeneral = 0;
+
+            pendData.forEach(item => {
+                let area = (item.area || 'SIN ÁREA').toUpperCase();
+                let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+
+                if (!agrupado[area]) {
+                    agrupado[area] = { cargos: {}, total: 0 };
+                }
+                if (!agrupado[area].cargos[cargo]) {
+                    agrupado[area].cargos[cargo] = 0;
+                }
+                agrupado[area].cargos[cargo]++;
+                agrupado[area].total++;
+                totalGeneral++;
+            });
+
+            document.getElementById('pendTotalBadge').textContent = `Total General: ${totalGeneral}`;
+
+            // Ordenar áreas alfabéticamente
+            let areasOrdenadas = Object.keys(agrupado).sort();
+
+            areasOrdenadas.forEach(area => {
+                // Fila del Área (Principal)
+                let trArea = document.createElement('tr');
+                trArea.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
+                trArea.innerHTML = `
+                    <td class="px-6 py-3 flex items-center gap-2">
+                        <span class="text-indigo-600">⊟</span> ${area}
+                    </td>
+                    <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[area].total}</td>
+                `;
+                tbody.appendChild(trArea);
+
+                // Ordenar cargos dentro del área alfabéticamente
+                let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
+
+                cargosOrdenados.forEach(cargo => {
+                    let count = agrupado[area].cargos[cargo];
+                    let trCargo = document.createElement('tr');
+                    trCargo.className = "hover:bg-slate-50 transition border-b border-slate-100 text-slate-700";
+                    trCargo.innerHTML = `
+                        <td class="px-6 py-2.5 pl-12 text-slate-600 font-medium">↳ ${cargo}</td>
+                        <td class="px-6 py-2.5 text-right font-semibold text-slate-800">${count}</td>
+                    `;
+                    tbody.appendChild(trCargo);
+                });
+            });
+        }
+
+        function exportarPendientesExcel() {
+            if (pendData.length === 0) {
+                alert("No hay datos para exportar.");
+                return;
+            }
+
+            let agrupado = {};
+            let totalGeneral = 0;
+            pendData.forEach(item => {
+                let area = (item.area || 'SIN ÁREA').toUpperCase();
+                let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
+                if (!agrupado[area]) agrupado[area] = { cargos: {}, total: 0 };
+                if (!agrupado[area].cargos[cargo]) agrupado[area].cargos[cargo] = 0;
+                agrupado[area].cargos[cargo]++;
+                agrupado[area].total++;
+                totalGeneral++;
+            });
+
+            let csvRows = [['ETIQUETAS DE FILA (ÁREA / CARGO)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')];
+            let areasOrdenadas = Object.keys(agrupado).sort();
+
+            areasOrdenadas.forEach(area => {
+                csvRows.push([`"${area}"`, `"${agrupado[area].total}"`].join(','));
+                let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
+                cargosOrdenados.forEach(cargo => {
+                    csvRows.push([`"    ${cargo}"`, `"${agrupado[area].cargos[cargo]}"`].join(','));
+                });
+            });
+            csvRows.push([`"Total general"`, `"${totalGeneral}"`].join(','));
+
+            downloadBlob(csvRows, 'Informe_Personal_Pendiente.csv');
+        }
 
         function initDropdowns() {
             const areas = [...new Set(rawData.map(item => item.area).filter(Boolean))].sort();
@@ -1064,7 +1249,6 @@
 
             renderBarChart('chartCargosMes', topCargosLabels, topCargosValues, chartCargosMesInstance, (inst) => chartCargosMesInstance = inst);
 
-            // BIZCOCHO / DONA (TIPO CONTRATO ACTIVOS)
             let contratoActivoCount = {};
             personalActivo.forEach(i => {
                 let tipo = (i.contrato && i.contrato.trim() !== "") ? i.contrato.trim().toUpperCase() : 'NO ESPECIFICADO';
@@ -1077,7 +1261,6 @@
 
             renderDoughnutChart('chartTipoContratoActivo', contratoLabels, contratoValues, chartTipoContratoInstance, (inst) => chartTipoContratoInstance = inst);
 
-            // ACTUALIZAR GRÁFICO DE BARRAS POR ÁREA (CUARTO CUADRO)
             actualizarGraficoCargosPorArea();
         }
 
@@ -1536,4 +1719,4 @@
         }
     </script>
 </body>
-</html>i
+</html>
