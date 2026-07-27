@@ -20,16 +20,43 @@
 </head>
 <body class="text-slate-800 antialiased">
 
+    <!-- PANTALLA DE LOGIN -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col justify-center items-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-slate-100">
+            <div class="flex flex-col items-center text-center">
+                <div class="bg-slate-50 rounded-2xl p-3 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-slate-100">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                </div>
+                <h1 class="text-xl font-bold text-slate-900">Talento Humano</h1>
+                <p class="text-xs text-slate-500 mt-1">Inicia sesión con tus credenciales autorizadas</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Usuario</label>
+                    <input type="text" id="loginUser" placeholder="Ingresa tu usuario" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Contraseña</label>
+                    <input type="password" id="loginPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                </div>
+                <div id="loginError" class="text-xs text-rose-600 font-medium text-center hidden"></div>
+                <button onclick="intentarLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-3.5 rounded-xl transition shadow-md shadow-indigo-200">
+                    Ingresar al Sistema 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla de Carga Inicial -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center">
+    <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center hidden">
         <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
         <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
-    <!-- ENCABEZADO MÓVIL FIJO CON EL ESTILO SOLICITADO -->
-    <div class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40">
-        <!-- Logo y Título Estilo Sidebar -->
+    <!-- ENCABEZADO MÓVIL FIJO CON PERMISOS -->
+    <div id="mobileHeader" class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40 hidden">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-9 h-9 shrink-0">
@@ -40,31 +67,17 @@
                     <p class="text-[11px] text-slate-400 font-medium">Dashboard Masivo</p>
                 </div>
             </div>
-            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium">Carlos C.</span>
+            <div class="flex items-center gap-2">
+                <span id="mobileSessionUser" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium"></span>
+                <button onclick="cerrarSesion()" class="text-[10px] bg-rose-600/80 hover:bg-rose-600 text-white px-2 py-1 rounded-md font-medium transition">Salir</button>
+            </div>
         </div>
         
-        <!-- Pestañas horizontales deslizables -->
-        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            <button onclick="switchTab('dashboard')" id="btn-m-dashboard" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0">
-                <span>📊</span> Vista General
-            </button>
-            <button onclick="switchTab('filters')" id="btn-m-filters" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
-                <span>🔍</span> Filtros Dinámicos
-            </button>
-            <button onclick="switchTab('birthdays')" id="btn-m-birthdays" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
-                <span>🎂</span> Cumpleaños
-            </button>
-            <button onclick="switchTab('table')" id="btn-m-table" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
-                <span>📋</span> Listado General
-            </button>
-            <button onclick="switchTab('export')" id="btn-m-export" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
-                <span>📥</span> Módulo de Exportación
-            </button>
-        </div>
+        <div id="mobileNavTabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
     </div>
 
-    <!-- Contenedor principal con margen superior en móvil para compensar el menú fijo -->
-    <div class="flex h-screen overflow-hidden pt-[116px] md:pt-0">
+    <!-- Contenedor principal -->
+    <div id="mainAppContainer" class="flex h-screen overflow-hidden pt-0 md:pt-0 hidden">
         <!-- Sidebar (Escritorio) -->
         <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div class="p-6">
@@ -77,22 +90,16 @@
                         <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
-                <nav class="space-y-1.5">
-                    <button onclick="switchTab('dashboard')" id="btn-d-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
-                    <button onclick="switchTab('filters')" id="btn-d-filters" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🔍 Filtros Dinámicos</button>
-                    <button onclick="switchTab('birthdays')" id="btn-d-birthdays" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🎂 Cumpleaños</button>
-                    <button onclick="switchTab('table')" id="btn-d-table" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📋 Listado General</button>
-                    <button onclick="switchTab('export')" id="btn-d-export" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📥 Módulo de Exportación</button>
-                </nav>
+                <nav id="desktopNavTabs" class="space-y-1.5"></nav>
             </div>
-            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
-                <span>Sesión: Carlos Corredor</span>
+            <div class="p-6 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
+                <span id="desktopSessionUser" class="font-medium text-slate-300">Sesión: -</span>
+                <button onclick="cerrarSesion()" class="text-rose-400 hover:text-rose-300 font-medium">Cerrar Sesión</button>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-            <!-- Header Escritorio -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto" id="mainContentArea">
             <header class="bg-white border-b border-slate-200 px-8 py-4 hidden md:flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Dashboard de Personal (Base Completa)</h2>
@@ -103,12 +110,10 @@
                 </div>
             </header>
 
-            <!-- Dashboard Body -->
             <div class="p-3 md:p-8 max-w-7xl mx-auto w-full space-y-6">
 
                 <!-- PESTAÑA 1: VISTA GENERAL -->
-                <div id="content-dashboard" class="tab-content active space-y-6">
-                    <!-- 3 KPIs en 1 línea horizontal ajustada para móvil y escritorio -->
+                <div id="content-dashboard" class="tab-content space-y-6">
                     <div class="grid grid-cols-3 gap-2 md:gap-6">
                         <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                             <p class="text-[9px] md:text-xs font-medium text-slate-500 uppercase tracking-tight">Registros Totales</p>
@@ -127,40 +132,25 @@
                         </div>
                     </div>
 
-                    <!-- GRÁFICOS (MES EN CURSO HASTA HOY) -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Evolución de Ingresos (Mes en Curso)</h3>
                                 <span id="labelMesVigente" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">HASTA HOY</span>
                             </div>
-                            <div class="h-72 w-full">
-                                <canvas id="chartEvolucionIngresosMes"></canvas>
-                            </div>
+                            <div class="h-72 w-full"><canvas id="chartEvolucionIngresosMes"></canvas></div>
                         </div>
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Personal por Cargo (Mes en Curso)</h3>
                                 <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold">INGRESOS DEL MES</span>
                             </div>
-                            <div class="h-72 w-full">
-                                <canvas id="chartCargosMes"></canvas>
-                            </div>
+                            <div class="h-72 w-full"><canvas id="chartCargosMes"></canvas></div>
                         </div>
-                    </div>
-
-                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-indigo-950 text-sm">¿Buscas un colaborador específico?</h4>
-                            <p class="text-xs text-indigo-800 mt-0.5">Utiliza el motor de búsqueda avanzada por cédula, nombre, área o cargo.</p>
-                        </div>
-                        <button onclick="switchTab('filters')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
-                            Ir a Filtros Dinámicos 🔍
-                        </button>
                     </div>
                 </div>
 
-                <!-- PESTAÑA 2: FILTROS DINÁMICOS CON EXPORTACIÓN -->
+                <!-- PESTAÑA 2: FILTROS DINÁMICOS -->
                 <div id="content-filters" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center">
@@ -173,7 +163,7 @@
                                 <input type="text" id="filterDoc" placeholder="Ej. 1022946672" oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Iniciales (ej. car cor za)</label>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Iniciales</label>
                                 <input type="text" id="filterName" placeholder="Escribe iniciales o nombre..." oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
@@ -216,19 +206,16 @@
                                         <th class="px-6 py-3">Estado</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dynamicTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
-                                    <!-- Dinámico -->
-                                </tbody>
+                                <tbody id="dynamicTableBody" class="divide-y divide-slate-200 text-xs text-slate-700"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- PESTAÑA: CUMPLEAÑOS -->
+                <!-- PESTAÑA 3: CUMPLEAÑOS -->
                 <div id="content-birthdays" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
-                        <p class="text-xs text-slate-500">Selecciona el rango de fechas (Día y Mes) para consultar los cumpleaños con su respectivo cargo y área.</p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
@@ -249,7 +236,7 @@
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                             <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños</h3>
-                            <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel de Cumpleaños</button>
+                            <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel</button>
                         </div>
                         <div class="overflow-x-auto max-h-[500px]">
                             <table class="w-full text-left border-collapse sticky top-0">
@@ -269,7 +256,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 3: LISTADO GENERAL -->
+                <!-- PESTAÑA 4: LISTADO GENERAL -->
                 <div id="content-table" class="tab-content space-y-6">
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
@@ -294,20 +281,16 @@
                                         <th class="px-6 py-3">Estado</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
-                                    <!-- Datos -->
-                                </tbody>
+                                <tbody id="tableBody" class="divide-y divide-slate-200 text-xs text-slate-700"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN AVANZADA -->
+                <!-- PESTAÑA 5: MÓDULO DE EXPORTACIÓN -->
                 <div id="content-export" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación Avanzada (Fechas, Cargo y Área)</h3>
-                        <p class="text-xs text-slate-500">Configura los filtros deseados para previsualizar y exportar el listado exacto.</p>
-                        
+                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación Avanzada</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
@@ -330,7 +313,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="pt-2">
                             <button onclick="previsualizarExportacion()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-6 rounded-lg transition shadow-sm">
                                 👁️ Consultar / Previsualizar Listado
@@ -342,10 +324,10 @@
                         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
                             <div>
                                 <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Exportar</h3>
-                                <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros en los filtros seleccionados</span>
+                                <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros</span>
                             </div>
                             <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
-                                📥 Descargar Excel / CSV (Celdas separadas)
+                                📥 Descargar Excel / CSV
                             </button>
                         </div>
                         <div class="overflow-x-auto max-h-[400px]">
@@ -362,7 +344,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="previewTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
-                                    <tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Haz clic en "Consultar / Previsualizar Listado" para ver los datos aquí.</td></tr>
+                                    <tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Haz clic en consultar para ver los datos.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -378,24 +360,171 @@
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
         
         let rawData = [];
+        let permisosActuales = {};
         let currentDynamicFiltered = [];
         let currentExportFiltered = [];
         let currentBDayFiltered = [];
         let chartEvolucionMesInstance = null;
         let chartCargosMesInstance = null;
 
-        function switchTab(tabName) {
-            ['dashboard', 'filters', 'birthdays', 'table', 'export'].forEach(t => {
-                document.getElementById(`content-${t}`).classList.remove('active');
+        const tabMapping = [
+            { id: 'dashboard', name: 'Vista General', icon: '📊', possibleCols: ['VISTA GENERAL', 'VISTAGENERAL'] },
+            { id: 'filters', name: 'Filtros Dinámicos', icon: '🔍', possibleCols: ['FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
+            { id: 'birthdays', name: 'Cumpleaños', icon: '🎂', possibleCols: ['CUMPLEAÑOS', 'CUMPLEANOS'] },
+            { id: 'table', name: 'Listado General', icon: '📋', possibleCols: ['LISTADO GENERAL', 'LISTADOGENERAL'] },
+            { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
+        ];
+
+        function intentarLogin() {
+            const userIn = document.getElementById('loginUser').value.trim();
+            const passIn = document.getElementById('loginPass').value.trim();
+            const errDiv = document.getElementById('loginError');
+
+            if(!userIn || !passIn) {
+                errDiv.textContent = "Por favor ingresa usuario y contraseña.";
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            errDiv.classList.add('hidden');
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+
+            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=Usuarios&tqx=responseHandler:handleLoginData`;
+            const script = document.createElement('script');
+            script.src = jsonpURL;
+            script.onerror = function() {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                errDiv.textContent = "Error al conectar con la pestaña Usuarios.";
+                errDiv.classList.remove('hidden');
+            };
+
+            window.handleLoginData = function(response) {
+                try {
+                    if (!response || !response.table) throw new Error("Estructura no válida.");
+                    const cols = response.table.cols.map(col => col ? (col.label || '').trim().toUpperCase() : '');
+                    const rows = response.table.rows;
+
+                    let usuariosList = rows.map(row => {
+                        let obj = {};
+                        if (row && row.c) {
+                            row.c.forEach((cell, index) => {
+                                let colName = cols[index];
+                                if (colName) {
+                                    let val = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '')) : '';
+                                    
+                                    // Guardamos la llave original
+                                    obj[colName.trim().toUpperCase()] = String(val).trim();
+                                    
+                                    // Guardamos también una versión normalizada (sin tildes ni espacios raros)
+                                    let cleanKey = colName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+                                    obj[cleanKey] = String(val).trim();
+                                }
+                            });
+                        }
+                        return obj;
+                    });
+
+                    // Validación con soporte exacto para CONTRASEÑA / CONTRASENA
+                    let usuarioEncontrado = usuariosList.find(u => {
+                        let uSheet = (u['USUARIO'] || '').trim().toLowerCase();
+                        let pSheet = String(u['CONTRASEÑA'] || u['CONTRASENA'] || '').trim();
+                        
+                        return uSheet === userIn.toLowerCase() && pSheet === passIn;
+                    });
+
+                    if(!usuarioEncontrado) {
+                        document.getElementById('loadingOverlay').classList.add('hidden');
+                        errDiv.textContent = "Usuario o contraseña incorrectos.";
+                        errDiv.classList.remove('hidden');
+                        return;
+                    }
+
+                    permisosActuales = usuarioEncontrado;
+                    
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mobileHeader').classList.remove('hidden');
+                    document.getElementById('mainAppContainer').classList.remove('hidden');
+                    
+                    document.getElementById('mobileSessionUser').textContent = usuarioEncontrado['USUARIO'];
+                    document.getElementById('desktopSessionUser').textContent = `Sesión: ${usuarioEncontrado['USUARIO']}`;
+
+                    construirNavegacionPermisos();
+                    fetchPersonalData();
+
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    errDiv.textContent = "Error al procesar los permisos de usuario.";
+                    errDiv.classList.remove('hidden');
+                }
+            };
+            document.head.appendChild(script);
+        }
+
+        function construirNavegacionPermisos() {
+            const mobileNav = document.getElementById('mobileNavTabs');
+            const desktopNav = document.getElementById('desktopNavTabs');
+            mobileNav.innerHTML = '';
+            desktopNav.innerHTML = '';
+
+            let primeraTabHabilitada = null;
+
+            tabMapping.forEach(tab => {
+                // Buscamos si alguna de las posibles variaciones de columnas tiene el valor 'SI'
+                let tienePermiso = false;
+                tab.possibleCols.forEach(cName => {
+                    let val1 = (permisosActuales[cName] || '').toUpperCase();
+                    let val2 = (permisosActuales[cName.normalize("NFD").replace(/[\u0300-\u036f]/g, "")] || '').toUpperCase();
+                    if(val1 === 'SI' || val2 === 'SI') {
+                        tienePermiso = true;
+                    }
+                });
                 
-                let btnD = document.getElementById(`btn-d-${t}`);
+                if(tienePermiso) {
+                    if(!primeraTabHabilitada) primeraTabHabilitada = tab.id;
+
+                    let btnM = document.createElement('button');
+                    btnM.onclick = () => switchTab(tab.id);
+                    btnM.id = `btn-m-${tab.id}`;
+                    btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
+                    btnM.innerHTML = `<span>${tab.icon}</span> ${tab.name}`;
+                    mobileNav.appendChild(btnM);
+
+                    let btnD = document.createElement('button');
+                    btnD.onclick = () => switchTab(tab.id);
+                    btnD.id = `btn-d-${tab.id}`;
+                    btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
+                    btnD.innerHTML = `${tab.icon} ${tab.name}`;
+                    desktopNav.appendChild(btnD);
+                }
+            });
+
+            if(primeraTabHabilitada) {
+                switchTab(primeraTabHabilitada);
+            } else {
+                alert("No tienes permisos asignados para visualizar ninguna pestaña.");
+                cerrarSesion();
+            }
+        }
+
+        function cerrarSesion() {
+            location.reload();
+        }
+
+        function switchTab(tabName) {
+            tabMapping.forEach(t => {
+                let content = document.getElementById(`content-${t.id}`);
+                if(content) content.classList.remove('active');
+                
+                let btnD = document.getElementById(`btn-d-${t.id}`);
                 if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
                 
-                let btnM = document.getElementById(`btn-m-${t}`);
+                let btnM = document.getElementById(`btn-m-${t.id}`);
                 if(btnM) btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
             });
 
-            document.getElementById(`content-${tabName}`).classList.add('active');
+            const activeContent = document.getElementById(`content-${tabName}`);
+            if(activeContent) activeContent.classList.add('active');
             
             let activeBtnD = document.getElementById(`btn-d-${tabName}`);
             if(activeBtnD) activeBtnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
@@ -408,16 +537,12 @@
             }
         }
 
-        window.onload = () => {
-            fetchData();
-        };
-
-        function fetchData() {
-            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=responseHandler:handleData`;
+        function fetchPersonalData() {
+            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=responseHandler:handlePersonalData`;
             const script = document.createElement('script');
             script.src = jsonpURL;
             script.onerror = function() {
-                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('loadingOverlay').classList.add('hidden');
                 if(document.getElementById('syncStatus')) {
                     document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error de conexión</span>';
                 }
@@ -425,7 +550,7 @@
             document.head.appendChild(script);
         }
 
-        window.handleData = function(response) {
+        window.handlePersonalData = function(response) {
             try {
                 if (!response || !response.table) throw new Error("Estructura no válida.");
 
@@ -458,7 +583,7 @@
                     status: item["ACTIVO/INACTIVO"] || item["ESTADO"] || item["ACTIVO"] || ""
                 })).filter(item => item.id !== "");
 
-                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('loadingOverlay').classList.add('hidden');
                 if(document.getElementById('syncStatus')) {
                     document.getElementById('syncStatus').innerHTML = `<span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado (${rawData.length} Registros)</span>`;
                 }
@@ -480,7 +605,7 @@
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('loadingOverlay').classList.add('hidden');
                 if(document.getElementById('syncStatus')) {
                     document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error al procesar datos</span>';
                 }
@@ -557,7 +682,6 @@
 
             document.getElementById('kpiIngresosMes').textContent = ingresosMesList.length;
 
-            // 1. Evolución de Ingresos (Mes en curso hasta hoy)
             let ingresosPorDiaMes = {};
             ingresosMesList.forEach(i => {
                 let d = parseDateStandard(i.date);
@@ -571,7 +695,6 @@
 
             renderLineChart('chartEvolucionIngresosMes', diasOrdenados, valoresDiasMes, chartEvolucionMesInstance, (inst) => chartEvolucionMesInstance = inst);
 
-            // 2. Personal por Cargo (Mes en curso)
             let cargosMesCount = {};
             ingresosMesList.forEach(i => {
                 let c = i.cargo || 'SIN CARGO';
@@ -608,9 +731,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 } } },
                         y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, precision: 0 } }
@@ -639,9 +760,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 20 } },
                         y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, precision: 0 } }
@@ -706,7 +825,7 @@
             document.getElementById('dynamicCount').textContent = `Mostrando ${data.length} de ${rawData.length} registros`;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No se encontraron registros con los filtros seleccionados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No se encontraron registros.</td></tr>`;
                 return;
             }
 
@@ -759,10 +878,9 @@
             } else if (format === 'word') {
                 let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head><meta charset='utf-8'><title>Reporte Word</title></head><body>
-                <h2>Reporte de Colaboradores - Filtros Dinámicos</h2>
+                <h2>Reporte de Colaboradores</h2>
                 <table border='1' cellspacing='0' cellpadding='5'>
-                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre Completo</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Fecha Ingreso</th><th>Estado</th></tr>`;
-                
+                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Ingreso</th><th>Estado</th></tr>`;
                 currentDynamicFiltered.forEach(item => {
                     htmlContent += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.cargo}</td><td>${item.area}</td><td>${item.city}</td><td>${item.date}</td><td>${item.status}</td></tr>`;
                 });
@@ -772,7 +890,7 @@
                 let url = URL.createObjectURL(blob);
                 let a = document.createElement('a');
                 a.href = url;
-                a.download = 'Reporte_Filtros_Dinamicos.doc';
+                a.download = 'Reporte.doc';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -814,14 +932,13 @@
             });
 
             if(currentBDayFiltered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">No se encontraron cumpleaños en este rango.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">No se encontraron cumpleaños.</td></tr>`;
                 return;
             }
 
             currentBDayFiltered.forEach(item => {
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                
                 let std = parseDateStandard(item.bday);
                 let [, m, d] = std.split('-');
                 let fechaCumpleanosActual = `${d}/${m}/${currentYear}`;
@@ -838,35 +955,27 @@
 
         function exportarCumpleanosExcel() {
             if(currentBDayFiltered.length === 0) {
-                alert("No hay datos de cumpleaños para exportar.");
+                alert("No hay datos para exportar.");
                 return;
             }
             let currentYear = new Date().getFullYear();
             let csvRows = [['NOMBRE COMPLETO', 'FECHA CUMPLEAÑOS', 'CARGO', 'AREA'].join(',')];
-            
             currentBDayFiltered.forEach(item => {
                 let std = parseDateStandard(item.bday);
                 let [, m, d] = std.split('-');
-                let fechaCumpleanosActual = `${d}/${m}/${currentYear}`;
-
-                csvRows.push([
-                    `"${(item.name || '').replace(/"/g, '""')}"`,
-                    `"${fechaCumpleanosActual}"`,
-                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
-                    `"${(item.area || '').replace(/"/g, '""')}"`
-                ].join(','));
+                csvRows.push([`"${item.name}"`, `"${d}/${m}/${currentYear}"`, `"${item.cargo}"`, `"${item.area}"`].join(','));
             });
-            downloadBlob(csvRows, 'Reporte_Cumpleanos_Ascendente.csv');
+            downloadBlob(csvRows, 'Cumpleanos.csv');
         }
 
         function renderListadoGeneralActivos() {
             const activos = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO');
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            document.getElementById('tableCount').textContent = `Mostrando ${activos.length} colaboradores activos`;
+            document.getElementById('tableCount').textContent = `Mostrando ${activos.length} activos`;
 
             if (activos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No hay personal activo registrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No hay personal activo.</td></tr>`;
                 return;
             }
 
@@ -883,11 +992,7 @@
                     <td class="px-6 py-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
                     <td class="px-6 py-3 text-slate-600">${item.city || 'N/A'}</td>
                     <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayDate}</td>
-                    <td class="px-6 py-3">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-700">
-                            ${item.status}
-                        </span>
-                    </td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-700">${item.status}</span></td>
                 `;
                 tbody.appendChild(tr);
             }
@@ -895,28 +1000,11 @@
 
         function exportarListadoGeneralExcel() {
             const activos = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO');
-            if (activos.length === 0) {
-                alert("No hay personal activo para exportar.");
-                return;
-            }
-
-            let csvRows = [];
-            csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
-
+            let csvRows = [['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(',')];
             activos.forEach(item => {
-                let row = [
-                    `"${item.id || ''}"`,
-                    `"${(item.name || '').replace(/"/g, '""')}"`,
-                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
-                    `"${(item.area || '').replace(/"/g, '""')}"`,
-                    `"${(item.city || '').replace(/"/g, '""')}"`,
-                    `"${item.date ? item.date.split(' ')[0] : ''}"`,
-                    `"${item.status || ''}"`
-                ];
-                csvRows.push(row.join(','));
+                csvRows.push([`"${item.id}"`, `"${item.name}"`, `"${item.cargo}"`, `"${item.area}"`, `"${item.city}"`, `"${item.date}"`, `"${item.status}"`].join(','));
             });
-
-            downloadBlob(csvRows, 'Listado_General_Activos.csv');
+            downloadBlob(csvRows, 'Listado_General.csv');
         }
 
         function previsualizarExportacion() {
@@ -931,7 +1019,7 @@
             tbody.innerHTML = '';
 
             if (!startStr || !endStr) {
-                statusDiv.innerHTML = '<span class="text-rose-600">⚠️ Por favor selecciona ambas fechas.</span>';
+                statusDiv.innerHTML = '<span class="text-rose-600">⚠️ Selecciona las fechas.</span>';
                 return;
             }
 
@@ -942,18 +1030,13 @@
                 let std = parseDateStandard(item.date);
                 if (!std) return false;
                 let itemDate = new Date(std);
-                
-                const matchDate = itemDate >= startDate && itemDate <= endDate;
-                const matchArea = areaVal === '' || item.area === areaVal;
-                const matchCargo = cargoVal === '' || item.cargo === cargoVal;
-
-                return matchDate && matchArea && matchCargo;
+                return itemDate >= startDate && itemDate <= endDate && (areaVal === '' || item.area === areaVal) && (cargoVal === '' || item.cargo === cargoVal);
             });
 
-            document.getElementById('previewCount').textContent = `${currentExportFiltered.length} registros en los filtros seleccionados`;
+            document.getElementById('previewCount').textContent = `${currentExportFiltered.length} registros`;
 
             if (currentExportFiltered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">No se encontraron registros con los filtros seleccionados.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Sin registros.</td></tr>`;
                 btnExport.disabled = true;
                 btnExport.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
@@ -976,31 +1059,16 @@
 
             btnExport.disabled = false;
             btnExport.classList.remove('opacity-50', 'cursor-not-allowed');
-            statusDiv.innerHTML = '<span class="text-emerald-600">✅ Vista previa cargada correctamente. Ya puedes exportar.</span>';
+            statusDiv.innerHTML = '<span class="text-emerald-600">✅ Vista previa cargada.</span>';
         }
 
         function ejecutarExportacionCSV() {
             if (currentExportFiltered.length === 0) return;
-
-            let csvRows = [];
-            csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
-
+            let csvRows = [['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(',')];
             currentExportFiltered.forEach(item => {
-                let row = [
-                    `"${item.id || ''}"`,
-                    `"${(item.name || '').replace(/"/g, '""')}"`,
-                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
-                    `"${(item.area || '').replace(/"/g, '""')}"`,
-                    `"${(item.city || '').replace(/"/g, '""')}"`,
-                    `"${item.date ? item.date.split(' ')[0] : ''}"`,
-                    `"${item.status || ''}"`
-                ];
-                csvRows.push(row.join(','));
+                csvRows.push([`"${item.id}"`, `"${item.name}"`, `"${item.cargo}"`, `"${item.area}"`, `"${item.city}"`, `"${item.date}"`, `"${item.status}"`].join(','));
             });
-
-            const startStr = document.getElementById('exportStart').value;
-            const endStr = document.getElementById('exportEnd').value;
-            downloadBlob(csvRows, `Colaboradores_Ingresos_Filtrado_${startStr}_al_${endStr}.csv`);
+            downloadBlob(csvRows, 'Reporte_Exportacion.csv');
         }
 
         function downloadBlob(rowsArray, filename) {
