@@ -56,6 +56,49 @@
         </div>
     </div>
 
+    <!-- MODAL DE CAMBIO DE CONTRASEÑA -->
+    <div id="changePassModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">🔑 Cambiar Contraseña</h3>
+                <button onclick="cerrarModalCambioPass()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-4">
+                <!-- Contraseña Actual -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Contraseña Actual</label>
+                    <div class="relative">
+                        <input type="password" id="currentPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button type="button" onclick="toggleVisibility('currentPass', 'eyeCurrent')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeCurrent">👁️</button>
+                    </div>
+                </div>
+                <!-- Nueva Contraseña -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="newPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button type="button" onclick="toggleVisibility('newPass', 'eyeNew')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeNew">👁️</button>
+                    </div>
+                </div>
+                <!-- Confirmar Nueva Contraseña -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="confirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button type="button" onclick="toggleVisibility('confirmPass', 'eyeConfirm')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeConfirm">👁️</button>
+                    </div>
+                </div>
+
+                <div id="modalPassMsg" class="text-xs font-medium text-center hidden"></div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="cerrarModalCambioPass()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2.5 rounded-xl transition">Cancelar</button>
+                    <button onclick="procesarCambioPass()" id="btnSavePass" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-md shadow-indigo-100">Guardar y Notificar 📲</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center hidden">
         <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
@@ -77,6 +120,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <span id="mobileSessionUser" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium"></span>
+                <button onclick="abrirModalCambioPass()" class="text-[10px] bg-indigo-600/80 hover:bg-indigo-600 text-white px-2 py-1 rounded-md font-medium transition">Clave 🔑</button>
                 <button onclick="cerrarSesion()" class="text-[10px] bg-rose-600/80 hover:bg-rose-600 text-white px-2 py-1 rounded-md font-medium transition">Salir</button>
             </div>
         </div>
@@ -100,9 +144,14 @@
                 </div>
                 <nav id="desktopNavTabs" class="space-y-1.5"></nav>
             </div>
-            <div class="p-6 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
-                <span id="desktopSessionUser" class="font-medium text-slate-300">Sesión: -</span>
-                <button onclick="cerrarSesion()" class="text-rose-400 hover:text-rose-300 font-medium">Cerrar Sesión</button>
+            <div class="p-6 border-t border-slate-800 flex flex-col gap-2 text-xs text-slate-400">
+                <div class="flex justify-between items-center">
+                    <span id="desktopSessionUser" class="font-medium text-slate-300">Sesión: -</span>
+                    <button onclick="cerrarSesion()" class="text-rose-400 hover:text-rose-300 font-medium">Cerrar Sesión</button>
+                </div>
+                <button onclick="abrirModalCambioPass()" class="w-full mt-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded-lg border border-slate-700 text-center font-medium transition">
+                    🔑 Cambiar Contraseña
+                </button>
             </div>
         </aside>
 
@@ -366,7 +415,9 @@
 
     <script>
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
-        
+        // Reemplazar este enlace por la Web App desplegada de Apps Script cuando la publiques
+        const appsScriptURL = 'https://script.google.com/macros/s/AKfycbym8rHYye2DzOj567EtIXHylwLtUlGOYl3CvGKeTTrhi4_QihPVL7ZIzxKLgIGzsHit/exec';
+
         let rawData = [];
         let permisosActuales = {};
         let currentDynamicFiltered = [];
@@ -383,7 +434,6 @@
             { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
         ];
 
-        // Verificar al cargar si hay credenciales guardadas en el dispositivo
         window.onload = () => {
             const savedUser = localStorage.getItem('th_user');
             const savedPass = localStorage.getItem('th_pass');
@@ -392,7 +442,6 @@
                 document.getElementById('loginUser').value = savedUser;
                 document.getElementById('loginPass').value = savedPass;
                 document.getElementById('rememberMe').checked = true;
-                // Intentar login automático de inmediato
                 intentarLogin(true);
             }
         };
@@ -468,7 +517,6 @@
                         return;
                     }
 
-                    // Guardar o borrar del dispositivo según el checkbox
                     if (remember) {
                         localStorage.setItem('th_user', userIn);
                         localStorage.setItem('th_pass', passIn);
@@ -499,6 +547,114 @@
                 }
             };
             document.head.appendChild(script);
+        }
+
+        // FUNCIONES DE CAMBIO DE CONTRASEÑA
+        function abrirModalCambioPass() {
+            document.getElementById('currentPass').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmPass').value = '';
+            document.getElementById('modalPassMsg').classList.add('hidden');
+            document.getElementById('changePassModal').classList.remove('hidden');
+        }
+
+        function cerrarModalCambioPass() {
+            document.getElementById('changePassModal').classList.add('hidden');
+        }
+
+        function toggleVisibility(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === "password") {
+                input.type = "text";
+                eye.textContent = "🙈";
+            } else {
+                input.type = "password";
+                eye.textContent = "👁️";
+            }
+        }
+
+        function procesarCambioPass() {
+            const currentP = document.getElementById('currentPass').value.trim();
+            const newP = document.getElementById('newPass').value.trim();
+            const confirmP = document.getElementById('confirmPass').value.trim();
+            const msgDiv = document.getElementById('modalPassMsg');
+            const btnSave = document.getElementById('btnSavePass');
+
+            const passGuardadaActual = String(permisosActuales['CONTRASEÑA'] || permisosActuales['CONTRASENA'] || '').trim();
+
+            if (!currentP || !newP || !confirmP) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "Por favor completa todos los campos.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (currentP !== passGuardadaActual) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "La contraseña actual es incorrecta.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newP !== confirmP) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "La nueva contraseña y su confirmación no coinciden.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newP.length < 4) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "La nueva contraseña debe tener al menos 4 caracteres.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            btnSave.disabled = true;
+            btnSave.textContent = "Actualizando...";
+
+            // Envío a Google Apps Script Web App
+            const payload = {
+                usuario: permisosActuales['USUARIO'],
+                currentPass: currentP,
+                newPass: newP
+            };
+
+            fetch(appsScriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Actualizamos localmente las credenciales del objeto de sesión
+                permisosActuales['CONTRASEÑA'] = newP;
+                permisosActuales['CONTRASENA'] = newP;
+
+                // Actualizamos localStorage si el usuario tenía activada la opción
+                if (localStorage.getItem('th_user')) {
+                    localStorage.setItem('th_pass', newP);
+                }
+
+                msgDiv.className = "text-xs font-medium text-center text-emerald-600";
+                msgDiv.textContent = "¡Contraseña actualizada con éxito! Notificación enviada por SMS.";
+                msgDiv.classList.remove('hidden');
+
+                setTimeout(() => {
+                    cerrarModalCambioPass();
+                    btnSave.disabled = false;
+                    btnSave.textContent = "Guardar y Notificar 📲";
+                }, 2000);
+            })
+            .catch(err => {
+                console.error(err);
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "Error al conectar con el servidor.";
+                msgDiv.classList.remove('hidden');
+                btnSave.disabled = false;
+                btnSave.textContent = "Guardar y Notificar 📲";
+            });
         }
 
         function construirNavegacionPermisos() {
