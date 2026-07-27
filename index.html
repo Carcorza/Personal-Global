@@ -21,7 +21,7 @@
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center">
         <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
-        <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
+        <h3 class="text-xl font-bold text-slate-800">Cargando Personal...</h3>
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
@@ -32,7 +32,7 @@
                 <div class="flex items-center gap-3 mb-8">
                     <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
                     <div>
-                        <h1 class="text-white font-bold text-sm">Talento Humano</h1>
+                        <h1 class="text-white font-bold text-sm">GLOBAL LIFE AMBULANCIAS SAS <BR></BR>Talento Humano</h1>
                         <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
@@ -94,16 +94,22 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <h3 class="font-semibold text-slate-800 text-sm mb-4">Distribución de Ingresos por Cargo (Mes Actual)</h3>
-                            <div class="h-64 flex justify-center">
-                                <canvas id="chartCargoMes"></canvas>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Evolución de Ingresos (Mes en Curso)</h3>
+                                <span id="labelMesVigente" class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-semibold">HASTA HOY</span>
+                            </div>
+                            <div class="h-72 w-full">
+                                <canvas id="chartEvolucionIngresosMes"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <h3 class="font-semibold text-slate-800 text-sm mb-4">Distribución de Ingresos por Área (Mes Actual)</h3>
-                            <div class="h-64 flex justify-center">
-                                <canvas id="chartAreaMes"></canvas>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Personal por Cargo (Mes en Curso)</h3>
+                                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold">INGRESOS DEL MES</span>
+                            </div>
+                            <div class="h-72 w-full">
+                                <canvas id="chartCargosMes"></canvas>
                             </div>
                         </div>
                     </div>
@@ -183,7 +189,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA: CUMPLEAÑOS (Con formato DD/MM/AÑO_ACTUAL) -->
+                <!-- PESTAÑA: CUMPLEAÑOS -->
                 <div id="content-birthdays" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
@@ -256,12 +262,13 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN CON VISTA PREVIA -->
+                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN CON FILTROS ADICIONALES -->
                 <div id="content-export" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación por Rango de Fechas de Ingreso</h3>
-                        <p class="text-xs text-slate-500">Selecciona el rango deseado para previsualizar el listado antes de exportarlo en celdas separadas.</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación Avanzada (Fechas, Cargo y Área)</h3>
+                        <p class="text-xs text-slate-500">Configura los filtros deseados para previsualizar y exportar el listado exacto.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
                                 <input type="date" id="exportStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -271,10 +278,23 @@
                                 <input type="date" id="exportEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
-                                <button onclick="previsualizarExportacion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
-                                    👁️ Consultar / Previsualizar Listado
-                                </button>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Área</label>
+                                <select id="exportArea" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <option value="">Todas las áreas</option>
+                                </select>
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Cargo</label>
+                                <select id="exportCargo" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <option value="">Todos los cargos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button onclick="previsualizarExportacion()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-6 rounded-lg transition shadow-sm">
+                                👁️ Consultar / Previsualizar Listado
+                            </button>
                         </div>
                     </div>
 
@@ -282,7 +302,7 @@
                         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
                             <div>
                                 <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Exportar</h3>
-                                <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros en el rango seleccionado</span>
+                                <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros en los filtros seleccionados</span>
                             </div>
                             <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
                                 📥 Descargar Excel / CSV (Celdas separadas)
@@ -321,8 +341,8 @@
         let currentDynamicFiltered = [];
         let currentExportFiltered = [];
         let currentBDayFiltered = [];
-        let chartCargoInstance = null;
-        let chartAreaInstance = null;
+        let chartEvolucionMesInstance = null;
+        let chartCargosMesInstance = null;
 
         function switchTab(tabName) {
             ['dashboard', 'filters', 'birthdays', 'table', 'export'].forEach(t => {
@@ -397,6 +417,8 @@
                 const y = now.getFullYear();
                 const m = String(now.getMonth() + 1).padStart(2, '0');
                 const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+                
+                // Fechas por defecto para exportación y cumpleaños
                 document.getElementById('exportStart').value = `${y}-${m}-01`;
                 document.getElementById('exportEnd').value = `${y}-${m}-${lastDay}`;
                 document.getElementById('bDayStart').value = `${y}-09-01`;
@@ -413,18 +435,24 @@
             const areas = [...new Set(rawData.map(item => item.area).filter(Boolean))].sort();
             const cargos = [...new Set(rawData.map(item => item.cargo).filter(Boolean))].sort();
 
+            // Llenar selectores de Filtros Dinámicos
             const areaSelect = document.getElementById('filterArea');
+            const exportAreaSelect = document.getElementById('exportArea');
             areas.forEach(a => {
-                let opt = document.createElement('option');
-                opt.value = a; opt.textContent = a;
-                areaSelect.appendChild(opt);
+                let opt1 = document.createElement('option'); opt1.value = a; opt1.textContent = a;
+                areaSelect.appendChild(opt1);
+                let opt2 = document.createElement('option'); opt2.value = a; opt2.textContent = a;
+                exportAreaSelect.appendChild(opt2);
             });
 
+            // Llenar selectores de Cargos
             const cargoSelect = document.getElementById('filterCargo');
+            const exportCargoSelect = document.getElementById('exportCargo');
             cargos.forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c; opt.textContent = c;
-                cargoSelect.appendChild(opt);
+                let opt1 = document.createElement('option'); opt1.value = c; opt1.textContent = c;
+                cargoSelect.appendChild(opt1);
+                let opt2 = document.createElement('option'); opt2.value = c; opt2.textContent = c;
+                exportCargoSelect.appendChild(opt2);
             });
         }
 
@@ -456,56 +484,112 @@
             
             const now = new Date();
             const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const yearMonthStr = `${year}-${month}`;
+            const monthNum = now.getMonth() + 1;
+            const monthStr = String(monthNum).padStart(2, '0');
+            const yearMonthStr = `${year}-${monthStr}`;
+            const currentDayTime = now.setHours(0,0,0,0);
+
+            const nombresMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+            document.getElementById('labelMesVigente').textContent = `${nombresMeses[monthNum - 1]} ${year} (HASTA HOY)`;
             
             let ingresosMesList = rawData.filter(i => {
                 if (!i.date) return false;
                 let d = parseDateStandard(i.date);
-                return d && d.startsWith(yearMonthStr);
+                if (!d || !d.startsWith(yearMonthStr)) return false;
+                
+                let itemDate = new Date(d).setHours(0,0,0,0);
+                return itemDate <= currentDayTime;
             });
 
             document.getElementById('kpiIngresosMes').textContent = ingresosMesList.length;
             document.getElementById('kpiAreas').textContent = [...new Set(rawData.map(i => i.area).filter(Boolean))].length;
 
+            let ingresosPorDiaMes = {};
+            ingresosMesList.forEach(i => {
+                let d = parseDateStandard(i.date);
+                if (d) {
+                    ingresosPorDiaMes[d] = (ingresosPorDiaMes[d] || 0) + 1;
+                }
+            });
+
+            let diasOrdenados = Object.keys(ingresosPorDiaMes).sort();
+            let valoresDiasMes = diasOrdenados.map(f => ingresosPorDiaMes[f]);
+
+            renderLineChart('chartEvolucionIngresosMes', diasOrdenados, valoresDiasMes, chartEvolucionMesInstance, (inst) => chartEvolucionMesInstance = inst);
+
             let cargosMesCount = {};
             ingresosMesList.forEach(i => {
-                let c = i.cargo || 'Sin Cargo';
+                let c = i.cargo || 'SIN CARGO';
                 cargosMesCount[c] = (cargosMesCount[c] || 0) + 1;
             });
 
-            let areasMesCount = {};
-            ingresosMesList.forEach(i => {
-                let a = i.area || 'Sin Área';
-                areasMesCount[a] = (areasMesCount[a] || 0) + 1;
-            });
+            let sortedCargosMes = Object.entries(cargosMesCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            let topCargosLabels = sortedCargosMes.map(item => item[0]);
+            let topCargosValues = sortedCargosMes.map(item => item[1]);
 
-            renderDoughnutChart('chartCargoMes', 'Ingresos por Cargo', Object.keys(cargosMesCount), Object.values(cargosMesCount), chartCargoInstance, (inst) => chartCargoInstance = inst);
-            renderDoughnutChart('chartAreaMes', 'Ingresos por Área', Object.keys(areasMesCount), Object.values(areasMesCount), chartAreaInstance, (inst) => chartAreaInstance = inst);
+            renderBarChart('chartCargosMes', topCargosLabels, topCargosValues, chartCargosMesInstance, (inst) => chartCargosMesInstance = inst);
         }
 
-        function renderDoughnutChart(canvasId, labelTitle, labels, dataVals, instance, setInstance) {
+        function renderLineChart(canvasId, labels, dataVals, instance, setInstance) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             if (instance) instance.destroy();
-            
+
             let newInstance = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: labelTitle,
+                        label: 'Ingresos Diarios',
                         data: dataVals,
-                        backgroundColor: [
-                            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
-                            '#f72585', '#b5179e', '#7209b7', '#10b981', '#f59e0b'
-                        ]
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#4361ee'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, precision: 0 } }
+                    }
+                }
+            });
+            setInstance(newInstance);
+        }
+
+        function renderBarChart(canvasId, labels, dataVals, instance, setInstance) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (instance) instance.destroy();
+
+            let newInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nuevos Ingresos',
+                        data: dataVals,
+                        backgroundColor: ['#4361ee', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                        borderRadius: 6,
+                        barThickness: 'flex'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 20 } },
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, precision: 0 } }
                     }
                 }
             });
@@ -640,7 +724,6 @@
             }
         }
 
-        // CUMPLEAÑOS ORDENADO ASCENDENTEMENTE CON FORMATO DD/MM/AÑO_ACTUAL
         function buscarCumpleanos() {
             const startStr = document.getElementById('bDayStart').value; 
             const endStr = document.getElementById('bDayEnd').value;
@@ -656,7 +739,7 @@
             let [, endM, endD] = endStr.split('-');
             let startVal = parseInt(startM + startD, 10);
             let endVal = parseInt(endM + endD, 10);
-            let currentYear = new Date().getFullYear(); // Año actual dinámico
+            let currentYear = new Date().getFullYear();
 
             currentBDayFiltered = rawData.filter(item => {
                 if(!item.bday) return false;
@@ -684,7 +767,6 @@
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
                 
-                // Extraer Día y Mes de la fecha de nacimiento y asignarle el año actual (Ej: 16/09/2026)
                 let std = parseDateStandard(item.bday);
                 let [, m, d] = std.split('-');
                 let fechaCumpleanosActual = `${d}/${m}/${currentYear}`;
@@ -756,9 +838,13 @@
             }
         }
 
+        // MÓDULO DE EXPORTACIÓN AVANZADA CON FILTRADO POR FECHA, ÁREA Y CARGO
         function previsualizarExportacion() {
             const startStr = document.getElementById('exportStart').value;
             const endStr = document.getElementById('exportEnd').value;
+            const areaVal = document.getElementById('exportArea').value;
+            const cargoVal = document.getElementById('exportCargo').value;
+            
             const statusDiv = document.getElementById('exportStatus');
             const tbody = document.getElementById('previewTableBody');
             const btnExport = document.getElementById('btnRealizarExport');
@@ -776,13 +862,18 @@
                 let std = parseDateStandard(item.date);
                 if (!std) return false;
                 let itemDate = new Date(std);
-                return itemDate >= startDate && itemDate <= endDate;
+                
+                const matchDate = itemDate >= startDate && itemDate <= endDate;
+                const matchArea = areaVal === '' || item.area === areaVal;
+                const matchCargo = cargoVal === '' || item.cargo === cargoVal;
+
+                return matchDate && matchArea && matchCargo;
             });
 
-            document.getElementById('previewCount').textContent = `${currentExportFiltered.length} registros en el rango seleccionado`;
+            document.getElementById('previewCount').textContent = `${currentExportFiltered.length} registros en los filtros seleccionados`;
 
             if (currentExportFiltered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">No se encontraron registros en este rango.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">No se encontraron registros con los filtros seleccionados.</td></tr>`;
                 btnExport.disabled = true;
                 btnExport.classList.add('opacity-50', 'cursor-not-allowed');
                 return;
@@ -829,7 +920,7 @@
 
             const startStr = document.getElementById('exportStart').value;
             const endStr = document.getElementById('exportEnd').value;
-            downloadBlob(csvRows, `Colaboradores_Ingresos_${startStr}_al_${endStr}.csv`);
+            downloadBlob(csvRows, `Colaboradores_Ingresos_Filtrado_${startStr}_al_${endStr}.csv`);
         }
 
         function downloadBlob(rowsArray, filename) {
