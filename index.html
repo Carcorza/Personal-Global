@@ -21,18 +21,32 @@
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center">
         <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
-        <h3 class="text-xl font-bold text-slate-800">Cargando Personal...</h3>
+        <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
+    <!-- ENCABEZADO SUPERIOR MÓVIL (VISIBLE SOLO EN CELULARES) -->
+    <div class="md:hidden bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800 shadow-md">
+        <div class="flex items-center gap-3">
+            <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
+            <div>
+                <h1 class="text-white font-bold text-sm">Talento Humano</h1>
+                <p class="text-[11px] text-slate-400">Dashboard Masivo</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Carlos C.</span>
+        </div>
+    </div>
+
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
+        <!-- Sidebar (Escritorio) -->
         <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
                     <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
                     <div>
-                        <h1 class="text-white font-bold text-sm">GLOBAL LIFE AMBULANCIAS SAS <BR></BR>Talento Humano</h1>
+                        <h1 class="text-white font-bold text-sm">Talento Humano</h1>
                         <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
@@ -51,14 +65,11 @@
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-            <!-- Header -->
-            <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-8 h-8 object-contain md:hidden">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Dashboard de Personal (Base Completa)</h2>
-                        <p class="text-xs text-slate-500">Gestión y control de colaboradores.</p>
-                    </div>
+            <!-- Header Escritorio -->
+            <header class="bg-white border-b border-slate-200 px-8 py-4 hidden md:flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Dashboard de Personal (Base Completa)</h2>
+                    <p class="text-xs text-slate-500">Gestión y control de colaboradores.</p>
                 </div>
                 <div id="syncStatus" class="flex items-center gap-2">
                     <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado</span>
@@ -66,7 +77,7 @@
             </header>
 
             <!-- Dashboard Body -->
-            <div class="p-8 max-w-7xl mx-auto w-full space-y-6">
+            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
 
                 <!-- PESTAÑA 1: VISTA GENERAL -->
                 <div id="content-dashboard" class="tab-content active space-y-6">
@@ -237,9 +248,14 @@
                 <!-- PESTAÑA 3: LISTADO GENERAL -->
                 <div id="content-table" class="tab-content space-y-6">
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="font-semibold text-slate-800 text-sm">Listado General (Personal Activo)</h3>
-                            <span id="tableCount" class="text-xs text-slate-500 font-medium">Mostrando 0 registros</span>
+                        <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-800 text-sm">Listado General (Personal Activo)</h3>
+                                <span id="tableCount" class="text-xs text-slate-500 font-medium">Mostrando 0 registros</span>
+                            </div>
+                            <button onclick="exportarListadoGeneralExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-sm">
+                                📊 Exportar Listado General a Excel
+                            </button>
                         </div>
                         <div class="overflow-x-auto max-h-[600px]">
                             <table class="w-full text-left border-collapse sticky top-0">
@@ -262,7 +278,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN CON FILTROS ADICIONALES -->
+                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN AVANZADA -->
                 <div id="content-export" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación Avanzada (Fechas, Cargo y Área)</h3>
@@ -347,10 +363,14 @@
         function switchTab(tabName) {
             ['dashboard', 'filters', 'birthdays', 'table', 'export'].forEach(t => {
                 document.getElementById(`content-${t}`).classList.remove('active');
-                document.getElementById(`btn-tab-${t}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
+                if(document.getElementById(`btn-tab-${t}`)) {
+                    document.getElementById(`btn-tab-${t}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
+                }
             });
             document.getElementById(`content-${tabName}`).classList.add('active');
-            document.getElementById(`btn-tab-${tabName}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
+            if(document.getElementById(`btn-tab-${tabName}`)) {
+                document.getElementById(`btn-tab-${tabName}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
+            }
             
             if(tabName === 'filters') {
                 applyFilters();
@@ -367,7 +387,9 @@
             script.src = jsonpURL;
             script.onerror = function() {
                 document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error de conexión</span>';
+                if(document.getElementById('syncStatus')) {
+                    document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error de conexión</span>';
+                }
             };
             document.head.appendChild(script);
         }
@@ -406,7 +428,9 @@
                 })).filter(item => item.id !== "");
 
                 document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('syncStatus').innerHTML = `<span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado (${rawData.length} Registros)</span>`;
+                if(document.getElementById('syncStatus')) {
+                    document.getElementById('syncStatus').innerHTML = `<span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado (${rawData.length} Registros)</span>`;
+                }
                 
                 initDropdowns();
                 updateDashboardGeneral();
@@ -418,7 +442,6 @@
                 const m = String(now.getMonth() + 1).padStart(2, '0');
                 const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
                 
-                // Fechas por defecto para exportación y cumpleaños
                 document.getElementById('exportStart').value = `${y}-${m}-01`;
                 document.getElementById('exportEnd').value = `${y}-${m}-${lastDay}`;
                 document.getElementById('bDayStart').value = `${y}-09-01`;
@@ -427,7 +450,9 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error al procesar datos</span>';
+                if(document.getElementById('syncStatus')) {
+                    document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error al procesar datos</span>';
+                }
             }
         };
 
@@ -435,7 +460,6 @@
             const areas = [...new Set(rawData.map(item => item.area).filter(Boolean))].sort();
             const cargos = [...new Set(rawData.map(item => item.cargo).filter(Boolean))].sort();
 
-            // Llenar selectores de Filtros Dinámicos
             const areaSelect = document.getElementById('filterArea');
             const exportAreaSelect = document.getElementById('exportArea');
             areas.forEach(a => {
@@ -445,7 +469,6 @@
                 exportAreaSelect.appendChild(opt2);
             });
 
-            // Llenar selectores de Cargos
             const cargoSelect = document.getElementById('filterCargo');
             const exportCargoSelect = document.getElementById('exportCargo');
             cargos.forEach(c => {
@@ -838,7 +861,32 @@
             }
         }
 
-        // MÓDULO DE EXPORTACIÓN AVANZADA CON FILTRADO POR FECHA, ÁREA Y CARGO
+        function exportarListadoGeneralExcel() {
+            const activos = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO');
+            if (activos.length === 0) {
+                alert("No hay personal activo para exportar.");
+                return;
+            }
+
+            let csvRows = [];
+            csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
+
+            activos.forEach(item => {
+                let row = [
+                    `"${item.id || ''}"`,
+                    `"${(item.name || '').replace(/"/g, '""')}"`,
+                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
+                    `"${(item.area || '').replace(/"/g, '""')}"`,
+                    `"${(item.city || '').replace(/"/g, '""')}"`,
+                    `"${item.date ? item.date.split(' ')[0] : ''}"`,
+                    `"${item.status || ''}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            downloadBlob(csvRows, 'Listado_General_Activos.csv');
+        }
+
         function previsualizarExportacion() {
             const startStr = document.getElementById('exportStart').value;
             const endStr = document.getElementById('exportEnd').value;
