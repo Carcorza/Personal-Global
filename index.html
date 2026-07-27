@@ -43,7 +43,7 @@
             <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium">Carlos C.</span>
         </div>
         
-        <!-- Pestañas horizontales deslizables con el mismo diseño e íconos -->
+        <!-- Pestañas horizontales deslizables -->
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             <button onclick="switchTab('dashboard')" id="btn-m-dashboard" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0">
                 <span>📊</span> Vista General
@@ -104,26 +104,26 @@
             </header>
 
             <!-- Dashboard Body -->
-            <div class="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+            <div class="p-3 md:p-8 max-w-7xl mx-auto w-full space-y-6">
 
                 <!-- PESTAÑA 1: VISTA GENERAL -->
                 <div id="content-dashboard" class="tab-content active space-y-6">
-                    <!-- 3 KPIs en 1 línea horizontal -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Registros Totales</p>
-                            <h3 id="kpiTotal" class="text-xl md:text-2xl font-bold text-slate-800 mt-2">0</h3>
-                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Base completa leída</span>
+                    <!-- 3 KPIs en 1 línea horizontal ajustada para móvil y escritorio -->
+                    <div class="grid grid-cols-3 gap-2 md:gap-6">
+                        <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[9px] md:text-xs font-medium text-slate-500 uppercase tracking-tight">Registros Totales</p>
+                            <h3 id="kpiTotal" class="text-base md:text-2xl font-bold text-slate-800 mt-1 md:mt-2">0</h3>
+                            <span class="text-[8px] md:text-xs text-slate-400 mt-0.5 md:mt-1 block truncate">Base completa</span>
                         </div>
-                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Personal Activo</p>
-                            <h3 id="kpiActivos" class="text-xl md:text-2xl font-bold text-indigo-600 mt-2">0</h3>
-                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Estado ACTIVO</span>
+                        <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[9px] md:text-xs font-medium text-slate-500 uppercase tracking-tight">Personal Activo</p>
+                            <h3 id="kpiActivos" class="text-base md:text-2xl font-bold text-indigo-600 mt-1 md:mt-2">0</h3>
+                            <span class="text-[8px] md:text-xs text-slate-400 mt-0.5 md:mt-1 block truncate">Estado ACTIVO</span>
                         </div>
-                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Nuevos Ingresos (Mes)</p>
-                            <h3 id="kpiIngresosMes" class="text-xl md:text-2xl font-bold text-emerald-600 mt-2">0</h3>
-                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Mes en curso</span>
+                        <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[9px] md:text-xs font-medium text-slate-500 uppercase tracking-tight">Nuevos Ingresos</p>
+                            <h3 id="kpiIngresosMes" class="text-base md:text-2xl font-bold text-emerald-600 mt-1 md:mt-2">0</h3>
+                            <span class="text-[8px] md:text-xs text-slate-400 mt-0.5 md:mt-1 block truncate">Mes en curso</span>
                         </div>
                     </div>
 
