@@ -14,6 +14,8 @@
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -25,17 +27,24 @@
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
-    <!-- ENCABEZADO SUPERIOR MÓVIL (VISIBLE SOLO EN CELULARES) -->
-    <div class="md:hidden bg-slate-900 text-white px-6 py-4 flex items-center justify-between border-b border-slate-800 shadow-md">
-        <div class="flex items-center gap-3">
-            <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
-            <div>
-                <h1 class="text-white font-bold text-sm">Talento Humano</h1>
-                <p class="text-[11px] text-slate-400">Dashboard Masivo</p>
+    <!-- ENCABEZADO SUPERIOR Y NAVEGACIÓN MÓVIL -->
+    <div class="md:hidden bg-slate-900 text-white px-4 py-3 flex flex-col gap-3 border-b border-slate-800 shadow-md">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-8 h-8 object-contain bg-white rounded-lg p-1">
+                <div>
+                    <h1 class="text-white font-bold text-xs">Talento Humano</h1>
+                    <p class="text-[10px] text-slate-400">Dashboard Masivo</p>
+                </div>
             </div>
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">Carlos C.</span>
         </div>
-        <div class="text-right">
-            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">Carlos C.</span>
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="switchTab('dashboard')" id="btn-m-dashboard" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium text-xs transition">📊 Vista General</button>
+            <button onclick="switchTab('filters')" id="btn-m-filters" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">🔍 Filtros</button>
+            <button onclick="switchTab('birthdays')" id="btn-m-birthdays" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">🎂 Cumpleaños</button>
+            <button onclick="switchTab('table')" id="btn-m-table" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">📋 Listado</button>
+            <button onclick="switchTab('export')" id="btn-m-export" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">📥 Exportar</button>
         </div>
     </div>
 
@@ -51,11 +60,11 @@
                     </div>
                 </div>
                 <nav class="space-y-1">
-                    <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
-                    <button onclick="switchTab('filters')" id="btn-tab-filters" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🔍 Filtros Dinámicos</button>
-                    <button onclick="switchTab('birthdays')" id="btn-tab-birthdays" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🎂 Cumpleaños</button>
-                    <button onclick="switchTab('table')" id="btn-tab-table" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📋 Listado General</button>
-                    <button onclick="switchTab('export')" id="btn-tab-export" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📥 Módulo de Exportación</button>
+                    <button onclick="switchTab('dashboard')" id="btn-d-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
+                    <button onclick="switchTab('filters')" id="btn-d-filters" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🔍 Filtros Dinámicos</button>
+                    <button onclick="switchTab('birthdays')" id="btn-d-birthdays" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🎂 Cumpleaños</button>
+                    <button onclick="switchTab('table')" id="btn-d-table" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📋 Listado General</button>
+                    <button onclick="switchTab('export')" id="btn-d-export" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📥 Módulo de Exportación</button>
                 </nav>
             </div>
             <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
@@ -81,29 +90,30 @@
 
                 <!-- PESTAÑA 1: VISTA GENERAL -->
                 <div id="content-dashboard" class="tab-content active space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-xs font-medium text-slate-500 uppercase">Registros Totales</p>
-                            <h3 id="kpiTotal" class="text-2xl font-bold text-slate-800 mt-2">0</h3>
-                            <span class="text-xs text-slate-400 mt-1 inline-block">Base completa leída</span>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Registros Totales</p>
+                            <h3 id="kpiTotal" class="text-xl md:text-2xl font-bold text-slate-800 mt-2">0</h3>
+                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Base completa leída</span>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-xs font-medium text-slate-500 uppercase">Personal Activo</p>
-                            <h3 id="kpiActivos" class="text-2xl font-bold text-indigo-600 mt-2">0</h3>
-                            <span class="text-xs text-slate-400 mt-1 inline-block">Estado ACTIVO</span>
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Personal Activo</p>
+                            <h3 id="kpiActivos" class="text-xl md:text-2xl font-bold text-indigo-600 mt-2">0</h3>
+                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Estado ACTIVO</span>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-xs font-medium text-slate-500 uppercase">Nuevos Ingresos (Mes)</p>
-                            <h3 id="kpiIngresosMes" class="text-2xl font-bold text-emerald-600 mt-2">0</h3>
-                            <span class="text-xs text-slate-400 mt-1 inline-block">Mes en curso</span>
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Nuevos Ingresos (Mes)</p>
+                            <h3 id="kpiIngresosMes" class="text-xl md:text-2xl font-bold text-emerald-600 mt-2">0</h3>
+                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Mes en curso</span>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-xs font-medium text-slate-500 uppercase">Áreas Registradas</p>
-                            <h3 id="kpiAreas" class="text-2xl font-bold text-amber-600 mt-2">0</h3>
-                            <span class="text-xs text-slate-400 mt-1 inline-block">Departamentos</span>
+                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Áreas Registradas</p>
+                            <h3 id="kpiAreas" class="text-xl md:text-2xl font-bold text-amber-600 mt-2">0</h3>
+                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Departamentos</span>
                         </div>
                     </div>
 
+                    <!-- GRÁFICOS (MES EN CURSO HASTA HOY) -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-4">
@@ -130,7 +140,7 @@
                             <h4 class="font-bold text-indigo-950 text-sm">¿Buscas un colaborador específico?</h4>
                             <p class="text-xs text-indigo-800 mt-0.5">Utiliza el motor de búsqueda avanzada por cédula, nombre, área o cargo.</p>
                         </div>
-                        <button onclick="switchTab('filters')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm">
+                        <button onclick="switchTab('filters')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm whitespace-nowrap">
                             Ir a Filtros Dinámicos 🔍
                         </button>
                     </div>
@@ -204,7 +214,7 @@
                 <div id="content-birthdays" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
-                        <p class="text-xs text-slate-500">Selecciona el rango de fechas (Día y Mes) para consultar los cumpleaños en orden ascendente.</p>
+                        <p class="text-xs text-slate-500">Selecciona el rango de fechas (Día y Mes) para consultar los cumpleaños con su respectivo cargo y área.</p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
@@ -224,7 +234,7 @@
 
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños (Orden Ascendente)</h3>
+                            <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños</h3>
                             <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel de Cumpleaños</button>
                         </div>
                         <div class="overflow-x-auto max-h-[500px]">
@@ -232,7 +242,7 @@
                                 <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
                                     <tr>
                                         <th class="px-6 py-3">Nombre Completo</th>
-                                        <th class="px-6 py-3">Fecha de Cumpleaños</th>
+                                        <th class="px-6 py-3">Fecha Nacimiento</th>
                                         <th class="px-6 py-3">Cargo</th>
                                         <th class="px-6 py-3">Área</th>
                                     </tr>
@@ -363,14 +373,21 @@
         function switchTab(tabName) {
             ['dashboard', 'filters', 'birthdays', 'table', 'export'].forEach(t => {
                 document.getElementById(`content-${t}`).classList.remove('active');
-                if(document.getElementById(`btn-tab-${t}`)) {
-                    document.getElementById(`btn-tab-${t}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
-                }
+                
+                let btnD = document.getElementById(`btn-d-${t}`);
+                if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
+                
+                let btnM = document.getElementById(`btn-m-${t}`);
+                if(btnM) btnM.className = "whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition";
             });
+
             document.getElementById(`content-${tabName}`).classList.add('active');
-            if(document.getElementById(`btn-tab-${tabName}`)) {
-                document.getElementById(`btn-tab-${tabName}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
-            }
+            
+            let activeBtnD = document.getElementById(`btn-d-${tabName}`);
+            if(activeBtnD) activeBtnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
+            
+            let activeBtnM = document.getElementById(`btn-m-${tabName}`);
+            if(activeBtnM) activeBtnM.className = "whitespace-nowrap px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium text-xs transition";
             
             if(tabName === 'filters') {
                 applyFilters();
@@ -504,6 +521,7 @@
         function updateDashboardGeneral() {
             document.getElementById('kpiTotal').textContent = rawData.length;
             document.getElementById('kpiActivos').textContent = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO').length;
+            document.getElementById('kpiAreas').textContent = [...new Set(rawData.map(i => i.area).filter(Boolean))].length;
             
             const now = new Date();
             const year = now.getFullYear();
@@ -525,8 +543,8 @@
             });
 
             document.getElementById('kpiIngresosMes').textContent = ingresosMesList.length;
-            document.getElementById('kpiAreas').textContent = [...new Set(rawData.map(i => i.area).filter(Boolean))].length;
 
+            // 1. Evolución de Ingresos (Mes en curso hasta hoy)
             let ingresosPorDiaMes = {};
             ingresosMesList.forEach(i => {
                 let d = parseDateStandard(i.date);
@@ -540,6 +558,7 @@
 
             renderLineChart('chartEvolucionIngresosMes', diasOrdenados, valoresDiasMes, chartEvolucionMesInstance, (inst) => chartEvolucionMesInstance = inst);
 
+            // 2. Personal por Cargo (Mes en curso)
             let cargosMesCount = {};
             ingresosMesList.forEach(i => {
                 let c = i.cargo || 'SIN CARGO';
