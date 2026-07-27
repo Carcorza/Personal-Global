@@ -41,7 +41,6 @@
                     <input type="password" id="loginPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                 </div>
                 
-                <!-- Opción de Recordar Sesión -->
                 <div class="flex items-center gap-2 pt-1">
                     <input type="checkbox" id="rememberMe" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
                     <label for="rememberMe" class="text-xs font-medium text-slate-600 select-none cursor-pointer">Recordar usuario y contraseña en este dispositivo</label>
@@ -56,7 +55,40 @@
         </div>
     </div>
 
-    <!-- MODAL DE CAMBIO DE CONTRASEÑA -->
+    <!-- MODAL OBLIGATORIO DE CAMBIO DE CONTRASEÑA (SI ES 123456) -->
+    <div id="forcedPassModal" class="fixed inset-0 bg-slate-900 z-50 flex justify-center items-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-5 border border-slate-100">
+            <div class="text-center space-y-1">
+                <div class="text-3xl mb-1">🔒</div>
+                <h3 class="text-lg font-bold text-slate-900">Actualización Obligatoria</h3>
+                <p class="text-xs text-slate-500">Por seguridad, debes cambiar tu contraseña predeterminada antes de continuar.</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="forcedNewPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button type="button" onclick="toggleVisibility('forcedNewPass', 'eyeForcedNew')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeForcedNew">👁️</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="forcedConfirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button type="button" onclick="toggleVisibility('forcedConfirmPass', 'eyeForcedConfirm')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeForcedConfirm">👁️</button>
+                    </div>
+                </div>
+
+                <div id="forcedPassMsg" class="text-xs font-medium text-center hidden"></div>
+
+                <button onclick="procesarCambioObligatorio()" id="btnForcedSave" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-indigo-100">
+                    Cambiar Clave y Entrar 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CAMBIO DE CONTRASEÑA DESDE EL MENÚ -->
     <div id="changePassModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-slate-100">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -64,7 +96,6 @@
                 <button onclick="cerrarModalCambioPass()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
             <div class="space-y-4">
-                <!-- Contraseña Actual -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Contraseña Actual</label>
                     <div class="relative">
@@ -72,7 +103,6 @@
                         <button type="button" onclick="toggleVisibility('currentPass', 'eyeCurrent')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeCurrent">👁️</button>
                     </div>
                 </div>
-                <!-- Nueva Contraseña -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Nueva Contraseña</label>
                     <div class="relative">
@@ -80,7 +110,6 @@
                         <button type="button" onclick="toggleVisibility('newPass', 'eyeNew')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeNew">👁️</button>
                     </div>
                 </div>
-                <!-- Confirmar Nueva Contraseña -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
                     <div class="relative">
@@ -415,8 +444,9 @@
 
     <script>
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
-        // Reemplazar este enlace por la Web App desplegada de Apps Script cuando la publiques
-        const appsScriptURL = 'https://script.google.com/macros/s/AKfycbym8rHYye2DzOj567EtIXHylwLtUlGOYl3CvGKeTTrhi4_QihPVL7ZIzxKLgIGzsHit/exec';
+        
+        // Pega aquí la URL de tu Web App de Google Apps Script cuando realices el despliegue
+        const appsScriptURL = 'https://script.google.com/macros/s/AKfycby.../exec';
 
         let rawData = [];
         let permisosActuales = {};
@@ -517,6 +547,19 @@
                         return;
                     }
 
+                    permisosActuales = usuarioEncontrado;
+                    let passActualEnHoja = String(permisosActuales['CONTRASEÑA'] || permisosActuales['CONTRASENA'] || '').trim();
+
+                    // VALIDACIÓN OBLIGATORIA: SI LA CLAVE ES 123456, SE ABRE EL MODAL DE CAMBIO OBLIGATORIO
+                    if (passActualEnHoja === '123456') {
+                        document.getElementById('loadingOverlay').classList.add('hidden');
+                        document.getElementById('forcedNewPass').value = '';
+                        document.getElementById('forcedConfirmPass').value = '';
+                        document.getElementById('forcedPassMsg').classList.add('hidden');
+                        document.getElementById('forcedPassModal').classList.remove('hidden');
+                        return;
+                    }
+
                     if (remember) {
                         localStorage.setItem('th_user', userIn);
                         localStorage.setItem('th_pass', passIn);
@@ -524,8 +567,6 @@
                         localStorage.removeItem('th_user');
                         localStorage.removeItem('th_pass');
                     }
-
-                    permisosActuales = usuarioEncontrado;
                     
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mobileHeader').classList.remove('hidden');
@@ -549,7 +590,95 @@
             document.head.appendChild(script);
         }
 
-        // FUNCIONES DE CAMBIO DE CONTRASEÑA
+        // PROCESAR CAMBIO OBLIGATORIO DE CONTRASEÑA (SI ERA 123456)
+        function procesarCambioObligatorio() {
+            const newP = document.getElementById('forcedNewPass').value.trim();
+            const confirmP = document.getElementById('forcedConfirmPass').value.trim();
+            const msgDiv = document.getElementById('forcedPassMsg');
+            const btnSave = document.getElementById('btnForcedSave');
+
+            if (!newP || !confirmP) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "Por favor completa todos los campos.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newP === '123456') {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "La nueva contraseña no puede ser igual a la predeterminada (123456).";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newP !== confirmP) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "Las contraseñas no coinciden.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newP.length < 4) {
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "La contraseña debe tener al menos 4 caracteres.";
+                msgDiv.classList.remove('hidden');
+                return;
+            }
+
+            btnSave.disabled = true;
+            btnSave.textContent = "Actualizando y notificando...";
+
+            const payload = {
+                usuario: permisosActuales['USUARIO'],
+                currentPass: '123456',
+                newPass: newP
+            };
+
+            fetch(appsScriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                permisosActuales['CONTRASEÑA'] = newP;
+                permisosActuales['CONTRASENA'] = newP;
+
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('th_user', permisosActuales['USUARIO']);
+                    localStorage.setItem('th_pass', newP);
+                }
+
+                msgDiv.className = "text-xs font-medium text-center text-emerald-600";
+                msgDiv.textContent = "¡Contraseña actualizada con éxito! Ingresando...";
+                msgDiv.classList.remove('hidden');
+
+                setTimeout(() => {
+                    document.getElementById('forcedPassModal').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mobileHeader').classList.remove('hidden');
+                    document.getElementById('mainAppContainer').classList.remove('hidden');
+                    
+                    document.getElementById('mobileSessionUser').textContent = permisosActuales['USUARIO'];
+                    document.getElementById('desktopSessionUser').textContent = `Sesión: ${permisosActuales['USUARIO']}`;
+
+                    construirNavegacionPermisos();
+                    fetchPersonalData();
+                    btnSave.disabled = false;
+                    btnSave.textContent = "Cambiar Clave y Entrar 🚀";
+                }, 1500);
+            })
+            .catch(err => {
+                console.error(err);
+                msgDiv.className = "text-xs font-medium text-center text-rose-600";
+                msgDiv.textContent = "Error al conectar con el servidor.";
+                msgDiv.classList.remove('hidden');
+                btnSave.disabled = false;
+                btnSave.textContent = "Cambiar Clave y Entrar 🚀";
+            });
+        }
+
+        // FUNCIONES DE CAMBIO DE CONTRASEÑA DESDE EL MENÚ
         function abrirModalCambioPass() {
             document.getElementById('currentPass').value = '';
             document.getElementById('newPass').value = '';
@@ -614,7 +743,6 @@
             btnSave.disabled = true;
             btnSave.textContent = "Actualizando...";
 
-            // Envío a Google Apps Script Web App
             const payload = {
                 usuario: permisosActuales['USUARIO'],
                 currentPass: currentP,
@@ -628,11 +756,9 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // Actualizamos localmente las credenciales del objeto de sesión
                 permisosActuales['CONTRASEÑA'] = newP;
                 permisosActuales['CONTRASENA'] = newP;
 
-                // Actualizamos localStorage si el usuario tenía activada la opción
                 if (localStorage.getItem('th_user')) {
                     localStorage.setItem('th_pass', newP);
                 }
