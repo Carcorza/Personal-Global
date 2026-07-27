@@ -40,8 +40,16 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Contraseña</label>
                     <input type="password" id="loginPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                 </div>
+                
+                <!-- Opción de Recordar Sesión -->
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                    <label for="rememberMe" class="text-xs font-medium text-slate-600 select-none cursor-pointer">Recordar usuario y contraseña en este dispositivo</label>
+                </div>
+
                 <div id="loginError" class="text-xs text-rose-600 font-medium text-center hidden"></div>
-                <button onclick="intentarLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-3.5 rounded-xl transition shadow-md shadow-indigo-200">
+                
+                <button onclick="intentarLogin(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-3.5 rounded-xl transition shadow-md shadow-indigo-200">
                     Ingresar al Sistema 🚀
                 </button>
             </div>
@@ -375,14 +383,31 @@
             { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
         ];
 
-        function intentarLogin() {
+        // Verificar al cargar si hay credenciales guardadas en el dispositivo
+        window.onload = () => {
+            const savedUser = localStorage.getItem('th_user');
+            const savedPass = localStorage.getItem('th_pass');
+            
+            if (savedUser && savedPass) {
+                document.getElementById('loginUser').value = savedUser;
+                document.getElementById('loginPass').value = savedPass;
+                document.getElementById('rememberMe').checked = true;
+                // Intentar login automático de inmediato
+                intentarLogin(true);
+            }
+        };
+
+        function intentarLogin(isAuto = false) {
             const userIn = document.getElementById('loginUser').value.trim();
             const passIn = document.getElementById('loginPass').value.trim();
+            const remember = document.getElementById('rememberMe').checked;
             const errDiv = document.getElementById('loginError');
 
             if(!userIn || !passIn) {
-                errDiv.textContent = "Por favor ingresa usuario y contraseña.";
-                errDiv.classList.remove('hidden');
+                if(!isAuto) {
+                    errDiv.textContent = "Por favor ingresa usuario y contraseña.";
+                    errDiv.classList.remove('hidden');
+                }
                 return;
             }
 
@@ -394,8 +419,13 @@
             script.src = jsonpURL;
             script.onerror = function() {
                 document.getElementById('loadingOverlay').classList.add('hidden');
-                errDiv.textContent = "Error al conectar con la pestaña Usuarios.";
-                errDiv.classList.remove('hidden');
+                if(!isAuto) {
+                    errDiv.textContent = "Error al conectar con la pestaña Usuarios.";
+                    errDiv.classList.remove('hidden');
+                } else {
+                    localStorage.removeItem('th_user');
+                    localStorage.removeItem('th_pass');
+                }
             };
 
             window.handleLoginData = function(response) {
@@ -411,11 +441,7 @@
                                 let colName = cols[index];
                                 if (colName) {
                                     let val = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '')) : '';
-                                    
-                                    // Guardamos la llave original
                                     obj[colName.trim().toUpperCase()] = String(val).trim();
-                                    
-                                    // Guardamos también una versión normalizada (sin tildes ni espacios raros)
                                     let cleanKey = colName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
                                     obj[cleanKey] = String(val).trim();
                                 }
@@ -424,19 +450,31 @@
                         return obj;
                     });
 
-                    // Validación con soporte exacto para CONTRASEÑA / CONTRASENA
                     let usuarioEncontrado = usuariosList.find(u => {
                         let uSheet = (u['USUARIO'] || '').trim().toLowerCase();
                         let pSheet = String(u['CONTRASEÑA'] || u['CONTRASENA'] || '').trim();
-                        
                         return uSheet === userIn.toLowerCase() && pSheet === passIn;
                     });
 
                     if(!usuarioEncontrado) {
                         document.getElementById('loadingOverlay').classList.add('hidden');
+                        if(isAuto) {
+                            localStorage.removeItem('th_user');
+                            localStorage.removeItem('th_pass');
+                            return;
+                        }
                         errDiv.textContent = "Usuario o contraseña incorrectos.";
                         errDiv.classList.remove('hidden');
                         return;
+                    }
+
+                    // Guardar o borrar del dispositivo según el checkbox
+                    if (remember) {
+                        localStorage.setItem('th_user', userIn);
+                        localStorage.setItem('th_pass', passIn);
+                    } else {
+                        localStorage.removeItem('th_user');
+                        localStorage.removeItem('th_pass');
                     }
 
                     permisosActuales = usuarioEncontrado;
@@ -454,8 +492,10 @@
                 } catch (e) {
                     console.error(e);
                     document.getElementById('loadingOverlay').classList.add('hidden');
-                    errDiv.textContent = "Error al procesar los permisos de usuario.";
-                    errDiv.classList.remove('hidden');
+                    if(!isAuto) {
+                        errDiv.textContent = "Error al procesar los permisos de usuario.";
+                        errDiv.classList.remove('hidden');
+                    }
                 }
             };
             document.head.appendChild(script);
@@ -470,7 +510,6 @@
             let primeraTabHabilitada = null;
 
             tabMapping.forEach(tab => {
-                // Buscamos si alguna de las posibles variaciones de columnas tiene el valor 'SI'
                 let tienePermiso = false;
                 tab.possibleCols.forEach(cName => {
                     let val1 = (permisosActuales[cName] || '').toUpperCase();
@@ -508,6 +547,8 @@
         }
 
         function cerrarSesion() {
+            localStorage.removeItem('th_user');
+            localStorage.removeItem('th_pass');
             location.reload();
         }
 
