@@ -27,40 +27,58 @@
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
-    <!-- ENCABEZADO SUPERIOR Y NAVEGACIÓN MÓVIL -->
-    <div class="md:hidden bg-slate-900 text-white px-4 py-3 flex flex-col gap-3 border-b border-slate-800 shadow-md">
+    <!-- ENCABEZADO MÓVIL FIJO CON EL ESTILO EXACTO SOLICITADO -->
+    <div class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40">
+        <!-- Logo y Título Estilo Sidebar -->
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-8 h-8 object-contain bg-white rounded-lg p-1">
+            <div class="flex items-center gap-3">
+                <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-9 h-9 shrink-0">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                </div>
                 <div>
-                    <h1 class="text-white font-bold text-xs">Talento Humano</h1>
-                    <p class="text-[10px] text-slate-400">Dashboard Masivo</p>
+                    <h1 class="text-white font-bold text-sm tracking-tight">Talento Humano</h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Dashboard Masivo</p>
                 </div>
             </div>
-            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">Carlos C.</span>
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium">Carlos C.</span>
         </div>
+        
+        <!-- Pestañas horizontales deslizables con el mismo diseño e íconos -->
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            <button onclick="switchTab('dashboard')" id="btn-m-dashboard" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium text-xs transition">📊 Vista General</button>
-            <button onclick="switchTab('filters')" id="btn-m-filters" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">🔍 Filtros</button>
-            <button onclick="switchTab('birthdays')" id="btn-m-birthdays" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">🎂 Cumpleaños</button>
-            <button onclick="switchTab('table')" id="btn-m-table" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">📋 Listado</button>
-            <button onclick="switchTab('export')" id="btn-m-export" class="whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition">📥 Exportar</button>
+            <button onclick="switchTab('dashboard')" id="btn-m-dashboard" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0">
+                <span>📊</span> Vista General
+            </button>
+            <button onclick="switchTab('filters')" id="btn-m-filters" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
+                <span>🔍</span> Filtros Dinámicos
+            </button>
+            <button onclick="switchTab('birthdays')" id="btn-m-birthdays" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
+                <span>🎂</span> Cumpleaños
+            </button>
+            <button onclick="switchTab('table')" id="btn-m-table" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
+                <span>📋</span> Listado General
+            </button>
+            <button onclick="switchTab('export')" id="btn-m-export" class="whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50">
+                <span>📥</span> Módulo de Exportación
+            </button>
         </div>
     </div>
 
-    <div class="flex h-screen overflow-hidden">
+    <!-- Contenedor principal con margen superior en móvil para compensar el menú fijo -->
+    <div class="flex h-screen overflow-hidden pt-[116px] md:pt-0">
         <!-- Sidebar (Escritorio) -->
         <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
+                    <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-10 h-10 shrink-0">
+                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                    </div>
                     <div>
                         <h1 class="text-white font-bold text-sm">Talento Humano</h1>
                         <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
-                <nav class="space-y-1">
-                    <button onclick="switchTab('dashboard')" id="btn-d-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
+                <nav class="space-y-1.5">
+                    <button onclick="switchTab('dashboard')" id="btn-d-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
                     <button onclick="switchTab('filters')" id="btn-d-filters" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🔍 Filtros Dinámicos</button>
                     <button onclick="switchTab('birthdays')" id="btn-d-birthdays" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🎂 Cumpleaños</button>
                     <button onclick="switchTab('table')" id="btn-d-table" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📋 Listado General</button>
@@ -378,7 +396,7 @@
                 if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
                 
                 let btnM = document.getElementById(`btn-m-${t}`);
-                if(btnM) btnM.className = "whitespace-nowrap px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-medium text-xs transition";
+                if(btnM) btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
             });
 
             document.getElementById(`content-${tabName}`).classList.add('active');
@@ -387,7 +405,7 @@
             if(activeBtnD) activeBtnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
             
             let activeBtnM = document.getElementById(`btn-m-${tabName}`);
-            if(activeBtnM) activeBtnM.className = "whitespace-nowrap px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium text-xs transition";
+            if(activeBtnM) activeBtnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-transparent";
             
             if(tabName === 'filters') {
                 applyFilters();
