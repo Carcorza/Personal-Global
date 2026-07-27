@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard General de Personal - Talento Humano</title>
+    
+    <!-- CONFIGURACIÓN DE ICONOS PARA MÓVILES Y PWA -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8">[cite: 5]
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8">[cite: 5]
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Talento Humano">
+    <meta name="theme-color" content="#0f172a">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos -->
@@ -26,8 +35,8 @@
     <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col justify-center items-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-slate-100">
             <div class="flex flex-col items-center text-center">
-                <div class="bg-slate-50 rounded-2xl p-3 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-slate-100">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                <div class="bg-white rounded-2xl p-2 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-slate-100 overflow-hidden">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">[cite: 5]
                 </div>
                 <h1 class="text-xl font-bold text-slate-900">Talento Humano</h1>
                 <p class="text-xs text-slate-500 mt-1">Inicia sesión con tus credenciales autorizadas</p>
@@ -132,7 +141,9 @@
 
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center hidden">
-        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
+        <div class="w-24 h-24 rounded-2xl bg-white shadow-md flex items-center justify-center p-2 mb-4 overflow-hidden animate-pulse border border-slate-100">
+            <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-full h-full object-contain">[cite: 5]
+        </div>
         <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
@@ -141,8 +152,8 @@
     <div id="mobileHeader" class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40 hidden">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-9 h-9 shrink-0">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                <div class="bg-white rounded-xl shadow-sm flex items-center justify-center w-9 h-9 shrink-0 overflow-hidden p-1">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">[cite: 5]
                 </div>
                 <div>
                     <h1 class="text-white font-bold text-sm tracking-tight">Talento Humano</h1>
@@ -165,8 +176,8 @@
         <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-10 h-10 shrink-0">
-                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                    <div class="bg-white rounded-xl shadow-sm flex items-center justify-center w-10 h-10 shrink-0 overflow-hidden p-1">
+                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">[cite: 5]
                     </div>
                     <div>
                         <h1 class="text-white font-bold text-sm">Talento Humano</h1>
