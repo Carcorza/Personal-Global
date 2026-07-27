@@ -27,7 +27,7 @@
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
-    <!-- ENCABEZADO MÓVIL FIJO CON EL ESTILO EXACTO SOLICITADO -->
+    <!-- ENCABEZADO MÓVIL FIJO CON EL ESTILO SOLICITADO -->
     <div class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40">
         <!-- Logo y Título Estilo Sidebar -->
         <div class="flex items-center justify-between">
@@ -108,7 +108,8 @@
 
                 <!-- PESTAÑA 1: VISTA GENERAL -->
                 <div id="content-dashboard" class="tab-content active space-y-6">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <!-- 3 KPIs en 1 línea horizontal -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                         <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                             <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Registros Totales</p>
                             <h3 id="kpiTotal" class="text-xl md:text-2xl font-bold text-slate-800 mt-2">0</h3>
@@ -123,11 +124,6 @@
                             <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Nuevos Ingresos (Mes)</p>
                             <h3 id="kpiIngresosMes" class="text-xl md:text-2xl font-bold text-emerald-600 mt-2">0</h3>
                             <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Mes en curso</span>
-                        </div>
-                        <div class="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                            <p class="text-[10px] md:text-xs font-medium text-slate-500 uppercase">Áreas Registradas</p>
-                            <h3 id="kpiAreas" class="text-xl md:text-2xl font-bold text-amber-600 mt-2">0</h3>
-                            <span class="text-[10px] md:text-xs text-slate-400 mt-1 inline-block">Departamentos</span>
                         </div>
                     </div>
 
@@ -539,7 +535,6 @@
         function updateDashboardGeneral() {
             document.getElementById('kpiTotal').textContent = rawData.length;
             document.getElementById('kpiActivos').textContent = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO').length;
-            document.getElementById('kpiAreas').textContent = [...new Set(rawData.map(i => i.area).filter(Boolean))].length;
             
             const now = new Date();
             const year = now.getFullYear();
