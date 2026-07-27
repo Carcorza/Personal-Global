@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Life - Dashboard General de Personal</title>
+    <title>Dashboard General de Personal - Talento Humano</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (XLSX) para exportar a Excel -->
+    <!-- SheetJS (XLSX) para exportar a Excel en formato de celdas real con ajuste de texto -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7fb; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -23,42 +23,42 @@
 <body class="text-slate-800 antialiased">
 
     <!-- PANTALLA DE LOGIN -->
-    <div id="loginScreen" class="fixed inset-0 bg-[#2263fc] z-50 flex flex-col justify-center items-center p-4">
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col justify-center items-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-slate-100">
             <div class="flex flex-col items-center text-center">
-                <div class="bg-blue-50 rounded-2xl p-3 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-blue-100">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Global Life Logo" class="w-full h-full object-contain">
+                <div class="bg-slate-50 rounded-2xl p-3 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-slate-100">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
                 </div>
-                <h1 class="text-xl font-bold text-slate-900">Global Life - Talento Humano</h1>
+                <h1 class="text-xl font-bold text-slate-900">Talento Humano</h1>
                 <p class="text-xs text-slate-500 mt-1">Inicia sesión con tus credenciales autorizadas</p>
             </div>
 
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Usuario</label>
-                    <input type="text" id="loginUser" placeholder="Ingresa tu usuario" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#2263fc] focus:outline-none transition">
+                    <input type="text" id="loginUser" placeholder="Ingresa tu usuario" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">Contraseña</label>
-                    <input type="password" id="loginPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#2263fc] focus:outline-none transition">
+                    <input type="password" id="loginPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
                 </div>
                 
                 <div class="flex items-center gap-2 pt-1">
-                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-[#2263fc] border-slate-300 rounded focus:ring-[#2263fc]">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
                     <label for="rememberMe" class="text-xs font-medium text-slate-600 select-none cursor-pointer">Recordar usuario y contraseña en este dispositivo</label>
                 </div>
 
                 <div id="loginError" class="text-xs text-rose-600 font-medium text-center hidden"></div>
                 
-                <button onclick="intentarLogin(false)" class="w-full bg-[#2263fc] hover:bg-[#2956b1] text-white font-semibold text-sm py-3.5 rounded-xl transition shadow-md shadow-blue-200">
+                <button onclick="intentarLogin(false)" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-3.5 rounded-xl transition shadow-md shadow-indigo-200">
                     Ingresar al Sistema 🚀
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL OBLIGATORIO DE CAMBIO DE CONTRASEÑA -->
-    <div id="forcedPassModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 hidden">
+    <!-- MODAL OBLIGATORIO DE CAMBIO DE CONTRASEÑA (SI ES 123456) -->
+    <div id="forcedPassModal" class="fixed inset-0 bg-slate-900 z-50 flex justify-center items-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-5 border border-slate-100">
             <div class="text-center space-y-1">
                 <div class="text-3xl mb-1">🔒</div>
@@ -69,28 +69,28 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Nueva Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="forcedNewPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                        <input type="password" id="forcedNewPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <button type="button" onclick="toggleVisibility('forcedNewPass', 'eyeForcedNew')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeForcedNew">👁️</button>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="forcedConfirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                        <input type="password" id="forcedConfirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <button type="button" onclick="toggleVisibility('forcedConfirmPass', 'eyeForcedConfirm')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeForcedConfirm">👁️</button>
                     </div>
                 </div>
 
                 <div id="forcedPassMsg" class="text-xs font-medium text-center hidden"></div>
 
-                <button onclick="procesarCambioObligatorio()" id="btnForcedSave" class="w-full bg-[#2263fc] hover:bg-[#2956b1] text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-blue-100">
+                <button onclick="procesarCambioObligatorio()" id="btnForcedSave" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-3 rounded-xl transition shadow-md shadow-indigo-100">
                     Cambiar Clave y Entrar 🚀
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE CAMBIO DE CONTRASEÑA -->
+    <!-- MODAL DE CAMBIO DE CONTRASEÑA DESDE EL MENÚ -->
     <div id="changePassModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-slate-100">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -101,21 +101,21 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Contraseña Actual</label>
                     <div class="relative">
-                        <input type="password" id="currentPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                        <input type="password" id="currentPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <button type="button" onclick="toggleVisibility('currentPass', 'eyeCurrent')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeCurrent">👁️</button>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Nueva Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="newPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                        <input type="password" id="newPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <button type="button" onclick="toggleVisibility('newPass', 'eyeNew')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeNew">👁️</button>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
                     <div class="relative">
-                        <input type="password" id="confirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                        <input type="password" id="confirmPass" placeholder="••••••••" class="w-full text-sm border border-slate-300 rounded-xl px-3.5 py-2.5 pr-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <button type="button" onclick="toggleVisibility('confirmPass', 'eyeConfirm')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs" id="eyeConfirm">👁️</button>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
 
                 <div class="flex gap-2 pt-2">
                     <button onclick="cerrarModalCambioPass()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2.5 rounded-xl transition">Cancelar</button>
-                    <button onclick="procesarCambioPass()" id="btnSavePass" class="w-1/2 bg-[#2263fc] hover:bg-[#2956b1] text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-md shadow-blue-100">Guardar y Notificar 📲</button>
+                    <button onclick="procesarCambioPass()" id="btnSavePass" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-md shadow-indigo-100">Guardar y Notificar 📲</button>
                 </div>
             </div>
         </div>
@@ -132,27 +132,27 @@
 
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center hidden">
-        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Global Life Logo" class="w-24 h-24 object-contain mb-4 animate-pulse">
+        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
         <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
-        <p class="text-xs text-slate-500 mt-1">Sincronizando información institucional, por favor espere.</p>
+        <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
     <!-- ENCABEZADO MÓVIL FIJO CON PERMISOS -->
-    <div id="mobileHeader" class="md:hidden bg-[#2263fc] text-white px-4 py-3 flex-col gap-3 border-b border-blue-700 shadow-lg fixed top-0 left-0 right-0 z-40 hidden">
+    <div id="mobileHeader" class="md:hidden bg-[#0f172a] text-white px-4 py-3 flex-col gap-3 border-b border-slate-800 shadow-lg fixed top-0 left-0 right-0 z-40 hidden">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-9 h-9 shrink-0">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Global Life Logo" class="w-full h-full object-contain">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div>
-                    <h1 class="text-white font-bold text-sm tracking-tight">Global Life</h1>
-                    <p class="text-[11px] text-blue-100 font-medium">Talento Humano</p>
+                    <h1 class="text-white font-bold text-sm tracking-tight">Talento Humano</h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Dashboard Masivo</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <span id="mobileSessionUser" class="text-[10px] bg-blue-700 text-blue-100 px-2 py-1 rounded-md border border-blue-600 font-medium"></span>
-                <button onclick="abrirModalCambioPass()" class="text-[10px] bg-[#2956b1] hover:bg-blue-800 text-white px-2 py-1 rounded-md font-medium transition">Clave 🔑</button>
-                <button onclick="cerrarSesion()" class="text-[10px] bg-rose-600/90 hover:bg-rose-600 text-white px-2 py-1 rounded-md font-medium transition">Salir</button>
+                <span id="mobileSessionUser" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md border border-slate-700 font-medium"></span>
+                <button onclick="abrirModalCambioPass()" class="text-[10px] bg-indigo-600/80 hover:bg-indigo-600 text-white px-2 py-1 rounded-md font-medium transition">Clave 🔑</button>
+                <button onclick="cerrarSesion()" class="text-[10px] bg-rose-600/80 hover:bg-rose-600 text-white px-2 py-1 rounded-md font-medium transition">Salir</button>
             </div>
         </div>
         
@@ -161,26 +161,26 @@
 
     <!-- Contenedor principal -->
     <div id="mainAppContainer" class="flex h-screen overflow-hidden pt-0 md:pt-0 hidden">
-        <!-- Sidebar (Escritorio) con Azul Institucional -->
-        <aside class="w-64 bg-[#2263fc] text-blue-50 hidden md:flex flex-col justify-between shadow-xl">
+        <!-- Sidebar (Escritorio) -->
+        <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
                     <div class="bg-white rounded-xl p-1.5 shadow-sm flex items-center justify-center w-10 h-10 shrink-0">
-                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Global Life Logo" class="w-full h-full object-contain">
+                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
                     </div>
                     <div>
-                        <h1 class="text-white font-bold text-sm">Global Life</h1>
-                        <p class="text-xs text-blue-100">Talento Humano</p>
+                        <h1 class="text-white font-bold text-sm">Talento Humano</h1>
+                        <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
                 <nav id="desktopNavTabs" class="space-y-1.5"></nav>
             </div>
-            <div class="p-6 border-t border-blue-500/40 flex flex-col gap-2 text-xs text-blue-100">
+            <div class="p-6 border-t border-slate-800 flex flex-col gap-2 text-xs text-slate-400">
                 <div class="flex justify-between items-center">
-                    <span id="desktopSessionUser" class="font-medium text-white truncate max-w-[120px]">Sesión: -</span>
-                    <button onclick="cerrarSesion()" class="text-rose-200 hover:text-white font-medium">Cerrar Sesión</button>
+                    <span id="desktopSessionUser" class="font-medium text-slate-300">Sesión: -</span>
+                    <button onclick="cerrarSesion()" class="text-rose-400 hover:text-rose-300 font-medium">Cerrar Sesión</button>
                 </div>
-                <button onclick="abrirModalCambioPass()" class="w-full mt-1 bg-[#2956b1] hover:bg-blue-700 text-white py-1.5 rounded-lg border border-blue-400/40 text-center font-medium transition shadow-sm">
+                <button onclick="abrirModalCambioPass()" class="w-full mt-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-1.5 rounded-lg border border-slate-700 text-center font-medium transition">
                     🔑 Cambiar Contraseña
                 </button>
             </div>
@@ -188,10 +188,10 @@
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col h-screen overflow-y-auto" id="mainContentArea">
-            <header class="bg-white border-b border-slate-200 px-8 py-4 hidden md:flex justify-between items-center shadow-xs">
+            <header class="bg-white border-b border-slate-200 px-8 py-4 hidden md:flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">Dashboard General de Personal</h2>
-                    <p class="text-xs text-slate-500">Gestión y control institucional de colaboradores.</p>
+                    <h2 class="text-xl font-bold text-slate-800">Dashboard de Personal (Base Completa)</h2>
+                    <p class="text-xs text-slate-500">Gestión y control de colaboradores.</p>
                 </div>
                 <div id="syncStatus" class="flex items-center gap-2">
                     <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado</span>
@@ -210,7 +210,7 @@
                         </div>
                         <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
                             <p class="text-[9px] md:text-xs font-medium text-slate-500 uppercase tracking-tight">Personal Activo</p>
-                            <h3 id="kpiActivos" class="text-base md:text-2xl font-bold text-[#2263fc] mt-1 md:mt-2">0</h3>
+                            <h3 id="kpiActivos" class="text-base md:text-2xl font-bold text-indigo-600 mt-1 md:mt-2">0</h3>
                             <span class="text-[8px] md:text-xs text-slate-400 mt-0.5 md:mt-1 block truncate">Estado ACTIVO</span>
                         </div>
                         <div class="bg-white p-2.5 md:p-6 rounded-xl border border-slate-200 shadow-sm">
@@ -231,7 +231,7 @@
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Personal por Cargo (Mes en Curso)</h3>
-                                <span class="text-[10px] bg-blue-50 text-[#2263fc] px-2 py-0.5 rounded font-semibold">INGRESOS DEL MES</span>
+                                <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-semibold">INGRESOS DEL MES</span>
                             </div>
                             <div class="h-72 w-full"><canvas id="chartCargosMes"></canvas></div>
                         </div>
@@ -249,7 +249,7 @@
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
                             <div class="flex justify-between items-center gap-2 flex-wrap">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Cargos por Área (Activos)</h3>
-                                <select id="selectAreaDashboard" onchange="actualizarGraficoCargosPorArea()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white font-medium text-slate-700 max-w-[200px]">
+                                <select id="selectAreaDashboard" onchange="actualizarGraficoCargosPorArea()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-medium text-slate-700 max-w-[200px]">
                                     <option value="">Todas las Áreas</option>
                                 </select>
                             </div>
@@ -263,26 +263,26 @@
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="font-semibold text-slate-800 text-sm">Filtros de Búsqueda Dinámica</h3>
-                            <button onclick="resetFilters()" class="text-xs text-[#2263fc] hover:underline font-medium">Limpiar Filtros</button>
+                            <button onclick="resetFilters()" class="text-xs text-indigo-600 hover:underline font-medium">Limpiar Filtros</button>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">N° Documento (Cédula)</label>
-                                <input type="text" id="filterDoc" placeholder="Ej. 1022946672" oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="text" id="filterDoc" placeholder="Ej. 1022946672" oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Iniciales</label>
-                                <input type="text" id="filterName" placeholder="Escribe iniciales o nombre..." oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="text" id="filterName" placeholder="Escribe iniciales o nombre..." oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Área</label>
-                                <select id="filterArea" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white">
+                                <select id="filterArea" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                     <option value="">Todas las áreas</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Cargo</label>
-                                <select id="filterCargo" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white">
+                                <select id="filterCargo" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                     <option value="">Todos los cargos</option>
                                 </select>
                             </div>
@@ -323,17 +323,17 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA: INFORMACIÓN PERSONAL -->
+                <!-- NUEVA PESTAÑA: INFORMACIÓN PERSONAL (ESTILO FORMULARIO COMPLETO DE CUADROS AZULES) -->
                 <div id="content-info-personal" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base">Ficha Detallada del Funcionario</h3>
-                                <p class="text-xs text-slate-500">Busca por número de cédula o por cualquier parte del nombre (ej. iniciales o apellidos) para ver toda la ficha en formato de cuadros con el estándar institucional.</p>
+                                <p class="text-xs text-slate-500">Busca por número de cédula o por cualquier parte del nombre (ej. iniciales o apellidos) para ver toda la ficha en formato de cuadros.</p>
                             </div>
                             <div class="flex items-center gap-2 w-full md:w-auto">
-                                <input type="text" id="searchInfoInput" placeholder="Cédula o parte del nombre..." class="text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-[#2263fc] focus:outline-none w-full md:w-80" onkeydown="if(event.key === 'Enter') buscarInformacionPersonal()">
-                                <button onclick="buscarInformacionPersonal()" class="bg-[#2263fc] hover:bg-[#2956b1] text-white font-medium text-sm py-2.5 px-6 rounded-lg transition shadow-sm shrink-0">
+                                <input type="text" id="searchInfoInput" placeholder="Cédula o parte del nombre..." class="text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-80" onkeydown="if(event.key === 'Enter') buscarInformacionPersonal()">
+                                <button onclick="buscarInformacionPersonal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 px-6 rounded-lg transition shadow-sm shrink-0">
                                     🔍 Buscar
                                 </button>
                             </div>
@@ -358,7 +358,7 @@
                             </div>
                             <div class="flex items-center gap-3 flex-wrap">
                                 <div class="w-48">
-                                    <select id="filterPendArea" onchange="renderPendientesTable()" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white font-medium text-slate-700">
+                                    <select id="filterPendArea" onchange="renderPendientesTable()" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-medium text-slate-700">
                                         <option value="">Todas las Áreas</option>
                                     </select>
                                 </div>
@@ -366,7 +366,7 @@
                                     <button id="btnModoSinCiudad" onclick="cambiarModoCiudad(false)" class="px-3 py-1.5 rounded-lg transition bg-white text-slate-800 shadow-sm">Sin Ciudad</button>
                                     <button id="btnModoConCiudad" onclick="cambiarModoCiudad(true)" class="px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">Con Ciudad</button>
                                 </div>
-                                <span id="pendTotalBadge" class="text-xs bg-blue-50 text-[#2263fc] px-3 py-2 rounded-lg font-bold border border-blue-100">Total General: 0</span>
+                                <span id="pendTotalBadge" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-lg font-bold border border-indigo-100">Total General: 0</span>
                                 <button onclick="exportarPendientesExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
                                     📊 Exportar Tabla a Excel
                                 </button>
@@ -377,7 +377,7 @@
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto max-h-[600px]">
                             <table class="w-full text-left border-collapse sticky top-0">
-                                <thead id="pendTableHead" class="bg-[#2263fc] text-white text-xs font-semibold uppercase tracking-wider"></thead>
+                                <thead id="pendTableHead" class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider"></thead>
                                 <tbody id="pendTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
                                     <tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">Cargando datos de P_PEND...</td></tr>
                                 </tbody>
@@ -386,7 +386,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA: LISTADO GENERAL -->
+                <!-- PESTAÑA 4: LISTADO GENERAL -->
                 <div id="content-table" class="tab-content space-y-6">
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
@@ -424,27 +424,27 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
-                                <input type="date" id="exportStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="exportStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
-                                <input type="date" id="exportEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="exportEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Área</label>
-                                <select id="exportArea" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white">
+                                <select id="exportArea" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                     <option value="">Todas las áreas</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Cargo</label>
-                                <select id="exportCargo" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none bg-white">
+                                <select id="exportCargo" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
                                     <option value="">Todos los cargos</option>
                                 </select>
                             </div>
                         </div>
                         <div class="pt-2">
-                            <button onclick="previsualizarExportacion()" class="w-full md:w-auto bg-[#2263fc] hover:bg-[#2956b1] text-white font-medium text-sm py-2 px-6 rounded-lg transition shadow-sm">
+                            <button onclick="previsualizarExportacion()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-6 rounded-lg transition shadow-sm">
                                 👁️ Consultar / Previsualizar Listado
                             </button>
                         </div>
@@ -489,11 +489,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde (Retiro)</label>
-                                <input type="date" id="retStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="retStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta (Retiro)</label>
-                                <input type="date" id="retEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="retEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <button onclick="buscarRetiros()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
@@ -541,14 +541,14 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
-                                <input type="date" id="bDayStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="bDayStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
-                                <input type="date" id="bDayEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#2263fc] focus:outline-none">
+                                <input type="date" id="bDayEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             </div>
                             <div>
-                                <button onclick="buscarCumpleanos()" class="w-full bg-[#2263fc] hover:bg-[#2956b1] text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
+                                <button onclick="buscarCumpleanos()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
                                     🔍 Consultar Cumpleaños
                                 </button>
                             </div>
@@ -584,6 +584,10 @@
 
     <script>
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
+        
+        // ==========================================
+        // PEGA AQUÍ LA URL DE TU WEB APP DE APPS SCRIPT
+        // ==========================================
         const appsScriptURL = 'https://script.google.com/macros/s/AKfycbwXoixFi07-aesobxOfS6Fq5HX4SqnLyYZdxXjTTHDwxrUYNiqIlgF-OxPHTknpcusi/exec';
 
         let rawData = [];
@@ -953,14 +957,14 @@
                     let btnM = document.createElement('button');
                     btnM.onclick = () => switchTab(tab.id);
                     btnM.id = `btn-m-${tab.id}`;
-                    btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-[#2956b1]/80 hover:bg-[#2956b1] text-blue-100 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-blue-400/30";
+                    btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
                     btnM.innerHTML = `<span>${tab.icon}</span> ${tab.name}`;
                     mobileNav.appendChild(btnM);
 
                     let btnD = document.createElement('button');
                     btnD.onclick = () => switchTab(tab.id);
                     btnD.id = `btn-d-${tab.id}`;
-                    btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-blue-100 hover:bg-[#2956b1] font-medium text-sm transition";
+                    btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
                     btnD.innerHTML = `${tab.icon} ${tab.name}`;
                     desktopNav.appendChild(btnD);
                 }
@@ -985,20 +989,20 @@
                 if(content) content.classList.remove('active');
                 
                 let btnD = document.getElementById(`btn-d-${t.id}`);
-                if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-blue-100 hover:bg-[#2956b1] font-medium text-sm transition";
+                if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
                 
                 let btnM_loop = document.getElementById(`btn-m-${t.id}`);
-                if(btnM_loop) btnM_loop.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-[#2956b1]/80 hover:bg-[#2956b1] text-blue-100 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-blue-400/30";
+                if(btnM_loop) btnM_loop.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
             });
 
             const activeContent = document.getElementById(`content-${tabName}`);
             if(activeContent) activeContent.classList.add('active');
             
             let activeBtnD = document.getElementById(`btn-d-${tabName}`);
-            if(activeBtnD) activeBtnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-white text-[#2263fc] font-bold text-sm transition shadow-sm";
+            if(activeBtnD) activeBtnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
             
             let activeBtnM = document.getElementById(`btn-m-${tabName}`);
-            if(activeBtnM) activeBtnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-white text-[#2263fc] font-bold text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-transparent";
+            if(activeBtnM) activeBtnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-transparent";
             
             if(tabName === 'filters') {
                 applyFilters();
@@ -1099,14 +1103,16 @@
             }
         };
 
+        // FUNCIÓN AUXILIAR PARA FORMATEAR FECHAS A dd/mm/yyyy
         function formatearFechaDDMMYYYY(fechaStr) {
             if (!fechaStr || fechaStr === "No asignado") return fechaStr;
             let std = parseDateStandard(fechaStr);
-            if (!std) return fechaStr;
+            if (!std) return fechaStr; // Si no es fecha reconocida, retorna tal cual
             let [y, m, d] = std.split('-');
             return `${d}/${m}/${y}`;
         }
 
+        // LÓGICA DE BÚSQUEDA Y FORMULARIO TIPO CUADROS AZULES PARA INFORMACIÓN PERSONAL
         function buscarInformacionPersonal() {
             const query = document.getElementById('searchInfoInput').value.trim();
             const container = document.getElementById('infoPersonalResultContainer');
@@ -1132,18 +1138,20 @@
                 let orig = item.original; 
                 
                 let card = document.createElement('div');
-                card.className = "bg-blue-50/60 p-6 rounded-2xl border border-blue-200 shadow-md space-y-3 font-sans";
+                card.className = "bg-slate-200 p-6 rounded-2xl border border-slate-300 shadow-lg space-y-3 font-sans";
                 
                 let fieldsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-2 text-xs">';
                 
                 for(let key in orig) {
                     let val = orig[key] !== "" ? orig[key] : "";
                     
+                    // Si el nombre de la columna indica fecha, la formateamos a dd/mm/yyyy
                     let upperKey = key.toUpperCase();
                     if(upperKey.includes("FECHA") || upperKey.includes("F.") || upperKey.includes("NACE") || upperKey.includes("CUMPLE")) {
                         val = formatearFechaDDMMYYYY(val);
                     }
 
+                    // Determinamos un ancho dinámico en columnas de Tailwind (span de 1 a 12) según la longitud de la celda
                     let colSpan = "col-span-1 sm:col-span-2 md:col-span-3";
                     if(upperKey.includes("NOMBRE") || upperKey.includes("CORREO") || upperKey.includes("OBSERVACION") || upperKey.includes("DIRECCION")) {
                         colSpan = "col-span-1 sm:col-span-4 md:col-span-4 lg:col-span-6";
@@ -1153,8 +1161,8 @@
 
                     fieldsHtml += `
                         <div class="${colSpan} flex flex-col">
-                            <span class="bg-[#2263fc] text-white text-[10px] font-bold px-2 py-1 rounded-t-md uppercase tracking-wider border border-[#2956b1] truncate" title="${key}">${key}</span>
-                            <div class="bg-white text-slate-900 font-semibold px-2.5 py-1.5 rounded-b-md border border-blue-200 shadow-inner select-all truncate min-h-[30px] flex items-center" title="${val}">
+                            <span class="bg-[#1e3a8a] text-white text-[10px] font-bold px-2 py-1 rounded-t-md uppercase tracking-wider border border-blue-900 truncate" title="${key}">${key}</span>
+                            <div class="bg-white text-slate-900 font-semibold px-2.5 py-1.5 rounded-b-md border border-slate-400 shadow-inner select-all truncate min-h-[30px] flex items-center" title="${val}">
                                 ${val}
                             </div>
                         </div>
@@ -1289,9 +1297,9 @@
 
                 areasOrdenadas.forEach(area => {
                     let trArea = document.createElement('tr');
-                    trArea.className = "bg-blue-50/80 font-bold text-slate-900 border-b border-blue-100 select-none";
+                    trArea.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
                     trArea.innerHTML = `
-                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-[#2263fc]">⊟</span> ${area}</td>
+                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-indigo-600">⊟</span> ${area}</td>
                         <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[area].total}</td>
                     `;
                     tbody.appendChild(trArea);
@@ -1331,9 +1339,9 @@
 
                 cargosOrdenados.forEach(cargo => {
                     let trCargo = document.createElement('tr');
-                    trCargo.className = "bg-blue-50/80 font-bold text-slate-900 border-b border-blue-100 select-none";
+                    trCargo.className = "bg-slate-100 font-bold text-slate-900 border-b border-slate-200 select-none";
                     trCargo.innerHTML = `
-                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-[#2263fc]">⊟</span> ${cargo}</td>
+                        <td class="px-6 py-3 flex items-center gap-2"><span class="text-indigo-600">⊟</span> ${cargo}</td>
                         <td class="px-6 py-3 text-right font-bold text-slate-900">${agrupado[cargo].total}</td>
                     `;
                     tbody.appendChild(trCargo);
@@ -1658,13 +1666,13 @@
                     datasets: [{
                         label: 'Ingresos Diarios',
                         data: dataVals,
-                        borderColor: '#2263fc',
-                        backgroundColor: 'rgba(34, 99, 207, 0.1)',
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
                         borderWidth: 2.5,
                         fill: true,
                         tension: 0.3,
                         pointRadius: 4,
-                        pointBackgroundColor: '#2263fc'
+                        pointBackgroundColor: '#4361ee'
                     }]
                 },
                 options: {
@@ -1691,7 +1699,7 @@
                     datasets: [{
                         label: 'Nuevos Ingresos',
                         data: dataVals,
-                        backgroundColor: ['#2263fc', '#2956b1', '#659bee', '#10b981', '#f59e0b', '#8b5cf6'],
+                        backgroundColor: ['#4361ee', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
                         borderRadius: 6,
                         barThickness: 'flex'
                     }]
@@ -1720,7 +1728,7 @@
                     datasets: [{
                         label: 'Cantidad',
                         data: dataVals,
-                        backgroundColor: ['#2263fc', '#2956b1', '#659bee', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'],
+                        backgroundColor: ['#10b981', '#4361ee', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'],
                         borderRadius: 6,
                         barThickness: 'flex'
                     }]
@@ -1747,7 +1755,7 @@
                     labels: labels,
                     datasets: [{
                         data: dataVals,
-                        backgroundColor: ['#2263fc', '#2956b1', '#659bee', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                        backgroundColor: ['#4361ee', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'],
                         borderWidth: 2,
                         borderColor: '#ffffff'
                     }]
@@ -1880,9 +1888,9 @@
             } else if (format === 'word') {
                 let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head><meta charset='utf-8'><title>Reporte Word</title></head><body>
-                <h2>Reporte de Colaboradores - Global Life</h2>
+                <h2>Reporte de Colaboradores</h2>
                 <table border='1' cellspacing='0' cellpadding='5'>
-                <tr style='background:#2263fc; color:#ffffff;'><th>Documento</th><th>Nombre</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Ingreso</th><th>Último Contrato</th><th>Fecha Renuncia</th><th>Obs. Renuncia</th><th>Estado</th></tr>`;
+                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Ingreso</th><th>Último Contrato</th><th>Fecha Renuncia</th><th>Obs. Renuncia</th><th>Estado</th></tr>`;
                 currentDynamicFiltered.forEach(item => {
                     htmlContent += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.cargo}</td><td>${item.area}</td><td>${item.city}</td><td>${item.date ? formatearFechaDDMMYYYY(item.date) : ''}</td><td>${item.fechaUltimoContrato ? formatearFechaDDMMYYYY(item.fechaUltimoContrato) : ''}</td><td>${item.fechaRenuncia ? formatearFechaDDMMYYYY(item.fechaRenuncia) : ''}</td><td>${item.obsRenuncia}</td><td>${item.status}</td></tr>`;
                 });
@@ -1892,7 +1900,7 @@
                 let url = URL.createObjectURL(blob);
                 let a = document.createElement('a');
                 a.href = url;
-                a.download = 'Reporte_GlobalLife.doc';
+                a.download = 'Reporte.doc';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -2087,6 +2095,7 @@
             exportarExcelProfesional(dataToExport, 'Reporte_Contratacion.xlsx');
         }
 
+        // MOTOR DE EXPORTACIÓN PROFESIONAL A EXCEL CON CELDAS Y AJUSTE DE TEXTO (TEXT WRAP)
         function exportarExcelProfesional(dataArray, filename) {
             const worksheet = XLSX.utils.json_to_sheet(dataArray);
 
