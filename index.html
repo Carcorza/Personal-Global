@@ -298,7 +298,8 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <button onclick="exportFilteredData('excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Exportar Excel</button>
-                                
+                                <button onclick="exportFilteredData('word')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📝 Exportar Word</button>
+                                <button onclick="exportFilteredData('pdf')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📄 Exportar PDF</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto max-h-[500px]">
@@ -311,9 +312,7 @@
                                         <th class="px-6 py-3">Área</th>
                                         <th class="px-6 py-3">Ciudad</th>
                                         <th class="px-6 py-3">Fecha Ingreso</th>
-                                        <th class="px-6 py-3">Fecha Ultimo Contrato</th>
-                                        <th class="px-6 py-3">Fecha Renuncia</th>
-                                        <th class="px-6 py-3">Observacion de Renuncia</th>
+                                        <th class="px-6 py-3">Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dynamicTableBody" class="divide-y divide-slate-200 text-xs text-slate-700"></tbody>
