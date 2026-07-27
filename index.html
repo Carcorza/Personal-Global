@@ -444,8 +444,6 @@
 
     <script>
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
-        
-        // Pega aquí la URL de tu Web App de Google Apps Script cuando realices el despliegue
         const appsScriptURL = 'https://script.google.com/macros/s/AKfycby.../exec';
 
         let rawData = [];
@@ -550,7 +548,6 @@
                     permisosActuales = usuarioEncontrado;
                     let passActualEnHoja = String(permisosActuales['CONTRASEÑA'] || permisosActuales['CONTRASENA'] || '').trim();
 
-                    // VALIDACIÓN OBLIGATORIA: SI LA CLAVE ES 123456, SE ABRE EL MODAL DE CAMBIO OBLIGATORIO
                     if (passActualEnHoja === '123456') {
                         document.getElementById('loadingOverlay').classList.add('hidden');
                         document.getElementById('forcedNewPass').value = '';
@@ -590,7 +587,6 @@
             document.head.appendChild(script);
         }
 
-        // PROCESAR CAMBIO OBLIGATORIO DE CONTRASEÑA (SI ERA 123456)
         function procesarCambioObligatorio() {
             const newP = document.getElementById('forcedNewPass').value.trim();
             const confirmP = document.getElementById('forcedConfirmPass').value.trim();
@@ -678,7 +674,6 @@
             });
         }
 
-        // FUNCIONES DE CAMBIO DE CONTRASEÑA DESDE EL MENÚ
         function abrirModalCambioPass() {
             document.getElementById('currentPass').value = '';
             document.getElementById('newPass').value = '';
@@ -916,15 +911,20 @@
                 renderListadoGeneralActivos();
                 applyFilters();
 
+                // DETECCIÓN AUTOMÁTICA DEL MES EN CURSO (DESDE EL 01 HASTA EL ÚLTIMO DÍA DEL MES)
                 const now = new Date();
                 const y = now.getFullYear();
                 const m = String(now.getMonth() + 1).padStart(2, '0');
-                const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+                const lastDayNum = new Date(y, now.getMonth() + 1, 0).getDate();
+                const lastDayStr = String(lastDayNum).padStart(2, '0');
                 
-                document.getElementById('exportStart').value = `${y}-${m}-01`;
-                document.getElementById('exportEnd').value = `${y}-${m}-${lastDay}`;
-                document.getElementById('bDayStart').value = `${y}-09-01`;
-                document.getElementById('bDayEnd').value = `${y}-09-30`;
+                const primerDiaMes = `${y}-${m}-01`;
+                const ultimoDiaMes = `${y}-${m}-${lastDayStr}`;
+
+                document.getElementById('exportStart').value = primerDiaMes;
+                document.getElementById('exportEnd').value = ultimoDiaMes;
+                document.getElementById('bDayStart').value = primerDiaMes;
+                document.getElementById('bDayEnd').value = ultimoDiaMes;
 
             } catch (error) {
                 console.error(error);
