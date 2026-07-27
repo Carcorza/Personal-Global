@@ -524,7 +524,7 @@
         const tabMapping = [
             { id: 'dashboard', name: 'Vista General', icon: '📊', possibleCols: ['VISTA GENERAL', 'VISTAGENERAL'] },
             { id: 'filters', name: 'Filtros Dinámicos', icon: '🔍', possibleCols: ['FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
-            { id: 'pendientes', name: 'Personal Pendiente', icon: '📈', possibleCols: ['PERSONAL PENDIENTE', 'PENDIENTES', 'P_PEND', 'VISTA GENERAL', 'VISTAGENERAL'] },
+            { id: 'pendientes', name: 'Personal Pendiente', icon: '📈', possibleCols: ['PERSONAL PENDIENTE', 'PENDIENTES', 'P_PEND', 'VISTAGENERAL'] },
             { id: 'birthdays', name: 'Cumpleaños', icon: '🎂', possibleCols: ['CUMPLEAÑOS', 'CUMPLEANOS'] },
             { id: 'table', name: 'Listado General', icon: '📋', possibleCols: ['LISTADO GENERAL', 'LISTADOGENERAL'] },
             { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
@@ -866,7 +866,7 @@
                     }
                 });
                 
-                if(tab.id === 'pendientes' || tienePermiso) {
+                if(tienePermiso) {
                     if(!primeraTabHabilitada) primeraTabHabilitada = tab.id;
 
                     let btnM = document.createElement('button');
@@ -888,7 +888,7 @@
             if(primeraTabHabilitada) {
                 switchTab(primeraTabHabilitada);
             } else {
-                switchTab('pendientes');
+                switchTab('dashboard');
             }
         }
 
@@ -1804,6 +1804,7 @@
             if (currentExportFiltered.length === 0) return;
             let csvRows = [['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(',')];
             currentExportFiltered.forEach(item => {
+                csvRows.z = item; // placeholder context dummy update
                 csvRows.push([`"${item.id}"`, `"${item.name}"`, `"${item.cargo}"`, `"${item.area}"`, `"${item.city}"`, `"${item.date}"`, `"${item.status}"`].join(','));
             });
             downloadBlob(csvRows, 'Reporte_Exportacion.csv');
