@@ -2,447 +2,842 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard de Personal - GitHub Pages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard General de Personal - Talento Humano</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Animación suave para el logo giratorio */
-        @keyframes girar {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-girar-lento {
-            animation: girar 2s linear infinite;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="text-slate-800 antialiased">
 
-    <!-- PANTALLA DE CARGA CON IMAGEN GIRATORIA -->
-    <div id="pantallaCarga" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="relative flex flex-col items-center">
-            <!-- Imagen de Google Drive con animación de giro -->
-            <img src="https://lh3.googleusercontent.com/d/17JZ5EQHX9VgU_jgYNIf5dZQjPl5IHGJu" alt="Cargando..." class="w-24 h-24 object-contain animate-girar-lento mb-4">
-            <h2 class="text-lg font-bold text-gray-800 tracking-wide">Cargando Dashboard...</h2>
-            <p class="text-xs text-gray-500 mt-1">Sincronizando información de personal, por favor espere.</p>
-        </div>
+    <!-- Pantalla de Carga Inicial -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center">
+        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-24 h-24 object-contain mb-4 animate-pulse">
+        <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
+        <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL DEL DASHBOARD -->
-    <div class="max-w-7xl mx-auto p-4 md:p-6">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>Dashboard de Control de Personal</h1>
-                <p class="text-sm text-gray-500 mt-1">Alojado en GitHub Pages con Espejo Local Activo.</p>
-            </div>
-            <div class="mt-4 md:mt-0 flex gap-2">
-                <button onclick="forzarSincronizacion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-rotate mr-1"></i> Sincronizar Datos</button>
-                <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"><i class="fa-solid fa-file-excel mr-1"></i> Exportar CSV</button>
-            </div>
-        </header>
-
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 bg-blue-50 text-blue-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-users"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Total Registros</p><h3 id="kpiTotal" class="text-xl font-bold text-gray-900">0</h3></div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-user-check"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Personal Activo</p><h3 id="kpiActivos" class="text-xl font-bold text-gray-900">0</h3></div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 bg-rose-50 text-rose-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-user-slash"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Personal Inactivo</p><h3 id="kpiInactivos" class="text-xl font-bold text-gray-900">0</h3></div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center">
-                <div class="p-3 bg-amber-50 text-amber-600 rounded-lg text-xl mr-4"><i class="fa-solid fa-briefcase"></i></div>
-                <div><p class="text-xs text-gray-500 font-medium">Cargos Únicos</p><h3 id="kpiCargos" class="text-xl font-bold text-gray-900">0</h3></div>
-            </div>
-        </div>
-
-        <!-- Filters & Search Section -->
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Búsqueda (Cédula o Nombre Completo)</label>
-                    <input type="text" id="searchInput" placeholder="Ej. 10229 o Carlos Corredor..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="filtrarDatos()">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Filtrar Activos / Inactivos</label>
-                    <div class="flex gap-2">
-                        <button onclick="setEstadoFiltro('TODOS')" id="btnTodos" class="flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold transition">Todos</button>
-                        <button onclick="setEstadoFiltro('ACTIVO')" id="btnActivos" class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-200 transition">Activos</button>
-                        <button onclick="setEstadoFiltro('INACTIVO')" id="btnInactivos" class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-200 transition">Inactivos</button>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
+                    <div>
+                        <h1 class="text-white font-bold text-sm">Talento Humano</h1>
+                        <p class="text-xs text-slate-400">Dashboard Masivo</p>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Filtrar por Cargo</label>
-                    <select id="cargoSelect" onchange="filtrarDatos()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Todos los Cargos</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Filtrar Ingreso / Retiro</label>
-                    <select id="tipoFiltro" onchange="filtrarDatos()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Todos</option>
-                        <option value="INGRESO">Solo Ingresos (Histórico)</option>
-                        <option value="MES_ACTUAL" class="font-bold text-blue-600">⭐ Ingresos de este Mes</option>
-                        <option value="RETIRO">Solo Retiros</option>
-                    </select>
-                </div>
+                <nav class="space-y-1">
+                    <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition">📊 Vista General</button>
+                    <button onclick="switchTab('filters')" id="btn-tab-filters" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🔍 Filtros Dinámicos</button>
+                    <button onclick="switchTab('birthdays')" id="btn-tab-birthdays" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">🎂 Cumpleaños</button>
+                    <button onclick="switchTab('table')" id="btn-tab-table" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📋 Listado General</button>
+                    <button onclick="switchTab('export')" id="btn-tab-export" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition">📥 Módulo de Exportación</button>
+                </nav>
             </div>
-        </div>
+            <div class="p-6 border-t border-slate-800 text-xs text-slate-500">
+                <span>Sesión: Carlos Corredor</span>
+            </div>
+        </aside>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-base font-bold text-gray-800">EVOLUCIÓN DE INGRESOS DIARIOS</h3>
-                    <span class="text-xs text-gray-400 font-semibold uppercase">Basado en Fecha Ingreso</span>
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-8 h-8 object-contain md:hidden">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Dashboard de Personal (Base Completa)</h2>
+                        <p class="text-xs text-slate-500">Gestión y control de colaboradores.</p>
+                    </div>
                 </div>
-                <div class="relative h-72">
-                    <canvas id="chartEvolucion"></canvas>
+                <div id="syncStatus" class="flex items-center gap-2">
+                    <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado</span>
                 </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <h3 class="text-base font-bold text-gray-800 mb-3">Personal por Cargo (Top Principales)</h3>
-                <div class="relative h-72">
-                    <canvas id="chartCargos"></canvas>
-                </div>
-            </div>
-        </div>
+            </header>
 
-        <!-- Data Table Section -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-base font-bold text-gray-800">Detalle de Registros (<span id="contadorRegistros">0</span>)</h3>
+            <!-- Dashboard Body -->
+            <div class="p-8 max-w-7xl mx-auto w-full space-y-6">
+
+                <!-- PESTAÑA 1: VISTA GENERAL -->
+                <div id="content-dashboard" class="tab-content active space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-medium text-slate-500 uppercase">Registros Totales</p>
+                            <h3 id="kpiTotal" class="text-2xl font-bold text-slate-800 mt-2">0</h3>
+                            <span class="text-xs text-slate-400 mt-1 inline-block">Base completa leída</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-medium text-slate-500 uppercase">Personal Activo</p>
+                            <h3 id="kpiActivos" class="text-2xl font-bold text-indigo-600 mt-2">0</h3>
+                            <span class="text-xs text-slate-400 mt-1 inline-block">Estado ACTIVO</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-medium text-slate-500 uppercase">Nuevos Ingresos (Mes)</p>
+                            <h3 id="kpiIngresosMes" class="text-2xl font-bold text-emerald-600 mt-2">0</h3>
+                            <span class="text-xs text-slate-400 mt-1 inline-block">Mes en curso</span>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <p class="text-xs font-medium text-slate-500 uppercase">Áreas Registradas</p>
+                            <h3 id="kpiAreas" class="text-2xl font-bold text-amber-600 mt-2">0</h3>
+                            <span class="text-xs text-slate-400 mt-1 inline-block">Departamentos</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-semibold text-slate-800 text-sm mb-4">Distribución de Ingresos por Cargo (Mes Actual)</h3>
+                            <div class="h-64 flex justify-center">
+                                <canvas id="chartCargoMes"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-semibold text-slate-800 text-sm mb-4">Distribución de Ingresos por Área (Mes Actual)</h3>
+                            <div class="h-64 flex justify-center">
+                                <canvas id="chartAreaMes"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-indigo-950 text-sm">¿Buscas un colaborador específico?</h4>
+                            <p class="text-xs text-indigo-800 mt-0.5">Utiliza el motor de búsqueda avanzada por cédula, nombre, área o cargo.</p>
+                        </div>
+                        <button onclick="switchTab('filters')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm">
+                            Ir a Filtros Dinámicos 🔍
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 2: FILTROS DINÁMICOS CON EXPORTACIÓN -->
+                <div id="content-filters" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-semibold text-slate-800 text-sm">Filtros de Búsqueda Dinámica</h3>
+                            <button onclick="resetFilters()" class="text-xs text-indigo-600 hover:underline font-medium">Limpiar Filtros</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">N° Documento (Cédula)</label>
+                                <input type="text" id="filterDoc" placeholder="Ej. 1022946672" oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Nombre o Iniciales (ej. car cor za)</label>
+                                <input type="text" id="filterName" placeholder="Escribe iniciales o nombre..." oninput="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Área</label>
+                                <select id="filterArea" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <option value="">Todas las áreas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Filtrar por Cargo</label>
+                                <select id="filterCargo" onchange="applyFilters()" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+                                    <option value="">Todos los cargos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-800 text-sm">Resultados de la Búsqueda Dinámica</h3>
+                                <span id="dynamicCount" class="text-xs text-slate-500 font-medium">Mostrando 0 registros</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportFilteredData('excel')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Exportar Excel</button>
+                                <button onclick="exportFilteredData('word')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📝 Exportar Word</button>
+                                <button onclick="exportFilteredData('pdf')" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📄 Exportar PDF</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3">Documento</th>
+                                        <th class="px-6 py-3">Nombre Completo</th>
+                                        <th class="px-6 py-3">Cargo</th>
+                                        <th class="px-6 py-3">Área</th>
+                                        <th class="px-6 py-3">Ciudad</th>
+                                        <th class="px-6 py-3">Fecha Ingreso</th>
+                                        <th class="px-6 py-3">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dynamicTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA: CUMPLEAÑOS (Con formato DD/MM/AÑO_ACTUAL) -->
+                <div id="content-birthdays" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
+                        <p class="text-xs text-slate-500">Selecciona el rango de fechas (Día y Mes) para consultar los cumpleaños en orden ascendente.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
+                                <input type="date" id="bDayStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
+                                <input type="date" id="bDayEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <button onclick="buscarCumpleanos()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
+                                    🔍 Consultar Cumpleaños
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                            <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños (Orden Ascendente)</h3>
+                            <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel de Cumpleaños</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3">Nombre Completo</th>
+                                        <th class="px-6 py-3">Fecha de Cumpleaños</th>
+                                        <th class="px-6 py-3">Cargo</th>
+                                        <th class="px-6 py-3">Área</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bDayTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">Selecciona un rango y haz clic en Consultar.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 3: LISTADO GENERAL -->
+                <div id="content-table" class="tab-content space-y-6">
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                            <h3 class="font-semibold text-slate-800 text-sm">Listado General (Personal Activo)</h3>
+                            <span id="tableCount" class="text-xs text-slate-500 font-medium">Mostrando 0 registros</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-[600px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3">Documento</th>
+                                        <th class="px-6 py-3">Nombre Completo</th>
+                                        <th class="px-6 py-3">Cargo</th>
+                                        <th class="px-6 py-3">Área</th>
+                                        <th class="px-6 py-3">Ciudad</th>
+                                        <th class="px-6 py-3">Fecha Ingreso</th>
+                                        <th class="px-6 py-3">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <!-- Datos -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 4: MÓDULO DE EXPORTACIÓN CON VISTA PREVIA -->
+                <div id="content-export" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación por Rango de Fechas de Ingreso</h3>
+                        <p class="text-xs text-slate-500">Selecciona el rango deseado para previsualizar el listado antes de exportarlo en celdas separadas.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
+                                <input type="date" id="exportStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
+                                <input type="date" id="exportEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <button onclick="previsualizarExportacion()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
+                                    👁️ Consultar / Previsualizar Listado
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-6">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                            <div>
+                                <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Exportar</h3>
+                                <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros en el rango seleccionado</span>
+                            </div>
+                            <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
+                                📥 Descargar Excel / CSV (Celdas separadas)
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[400px]">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-2">Documento</th>
+                                        <th class="px-4 py-2">Nombre Completo</th>
+                                        <th class="px-4 py-2">Cargo</th>
+                                        <th class="px-4 py-2">Área</th>
+                                        <th class="px-4 py-2">Ciudad</th>
+                                        <th class="px-4 py-2">Fecha Ingreso</th>
+                                        <th class="px-4 py-2">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="previewTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">Haz clic en "Consultar / Previsualizar Listado" para ver los datos aquí.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="exportStatus" class="text-xs font-medium text-slate-600"></div>
+                    </div>
+                </div>
+
             </div>
-            <div class="overflow-x-auto max-h-96">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-gray-100 sticky top-0 text-gray-700 uppercase font-semibold">
-                        <tr>
-                            <th class="p-3">Identificación</th>
-                            <th class="p-3">Nombre Completo</th>
-                            <th class="p-3">Cargo</th>
-                            <th class="p-3">F. Ingreso</th>
-                            <th class="p-3">Último Contrato</th>
-                            <th class="p-3">F. Retiro / Renuncia</th>
-                            <th class="p-3">Observación Retiro</th>
-                            <th class="p-3 text-center">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaCuerpo" class="divide-y divide-gray-100">
-                        <tr><td colspan="8" class="p-6 text-center text-gray-500">Cargando datos...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // PEGA AQUÍ TU URL DE LA APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-        const API_URL = "https://script.google.com/macros/s/AKfycbz4pj9nxwFIvfEPey_G_ll4j3hawfcyST7jP4F2Z60ocmQUCh2jJXBOCwOPlmEDAi2i/exec";
+        const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
+        
+        let rawData = [];
+        let currentDynamicFiltered = [];
+        let currentExportFiltered = [];
+        let currentBDayFiltered = [];
+        let chartCargoInstance = null;
+        let chartAreaInstance = null;
 
-        const CLAVE_ESPEJO = "google_sheet_espejo_personal_v2";
-        let allData = [];
-        let filteredData = [];
-        let estadoFiltroActual = 'TODOS';
-        let chartEvoInstance = null;
-        let chartCargosInstance = null;
+        function switchTab(tabName) {
+            ['dashboard', 'filters', 'birthdays', 'table', 'export'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.remove('active');
+                document.getElementById(`btn-tab-${t}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
+            });
+            document.getElementById(`content-${tabName}`).classList.add('active');
+            document.getElementById(`btn-tab-${tabName}`).className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm transition";
+            
+            if(tabName === 'filters') {
+                applyFilters();
+            }
+        }
 
-        window.onload = function() {
-            inicializarDashboard();
+        window.onload = () => {
+            fetchData();
         };
 
-        function ocultarPantallaCarga() {
-            const pantalla = document.getElementById('pantallaCarga');
-            if (pantalla) {
-                pantalla.style.opacity = '0';
-                setTimeout(() => { pantalla.style.display = 'none'; }, 500);
-            }
+        function fetchData() {
+            const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=responseHandler:handleData`;
+            const script = document.createElement('script');
+            script.src = jsonpURL;
+            script.onerror = function() {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error de conexión</span>';
+            };
+            document.head.appendChild(script);
         }
 
-        function inicializarDashboard() {
-            if (API_URL.includes("TU_URL")) {
-                alert("Por favor configura la variable API_URL con tu enlace de Google Apps Script.");
-                ocultarPantallaCarga();
-                return;
-            }
+        window.handleData = function(response) {
+            try {
+                if (!response || !response.table) throw new Error("Estructura no válida.");
 
-            // 1. CARGA INMEDIATA DESDE EL ESPEJO LOCAL
-            const datosGuardados = localStorage.getItem(CLAVE_ESPEJO);
-            if (datosGuardados) {
-                try {
-                    allData = JSON.parse(datosGuardados);
-                    poblarCargosSelect();
-                    filtrarDatos();
-                    ocultarPantallaCarga(); // Oculta la pantalla de carga rápido si hay espejo
-                } catch(e) {
-                    console.error("Error al leer espejo:", e);
-                }
-            }
+                const cols = response.table.cols.map(col => col ? (col.label || '').trim().toUpperCase() : '');
+                const rows = response.table.rows;
 
-            // 2. SINCRONIZAR EN SEGUNDO PLANO O CARGAR INICIAL
-            sincronizarDatosSilencioso(!datosGuardados);
-        }
-
-        function sincronizarDatosSilencioso(mostrarCargaSiNoHayDatos) {
-            fetch(API_URL)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.length > 0) {
-                        allData = data;
-                        localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data));
-                        poblarCargosSelect();
-                        filtrarDatos();
+                rawData = rows.map(row => {
+                    let obj = {};
+                    if (row && row.c) {
+                        row.c.forEach((cell, index) => {
+                            let colName = cols[index];
+                            if (colName) {
+                                let val = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '')) : '';
+                                let cleanKey = colName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                                obj[cleanKey] = String(val).trim();
+                            }
+                        });
                     }
-                    ocultarPantallaCarga();
-                })
-                .catch(err => {
-                    console.warn("Aviso: No se pudo actualizar en segundo plano, usando datos locales.", err);
-                    ocultarPantallaCarga();
+                    return obj;
                 });
-        }
 
-        function forzarSincronizacion() {
-            const pantalla = document.getElementById('pantallaCarga');
-            pantalla.style.display = 'flex';
-            pantalla.style.opacity = '1';
-            
-            fetch(API_URL)
-                .then(res => res.json())
-                .then(data => {
-                    allData = data;
-                    localStorage.setItem(CLAVE_ESPEJO, JSON.stringify(data));
-                    poblarCargosSelect();
-                    filtrarDatos();
-                    ocultarPantallaCarga();
-                    alert("¡Datos sincronizados correctamente!");
-                })
-                .catch(err => {
-                    ocultarPantallaCarga();
-                    alert("Error al sincronizar. Revisa los permisos de la aplicación web en Google.");
-                });
-        }
+                rawData = rawData.map(item => ({
+                    id: item["IDENTIFICACION"] || item["DOCUMENTO"] || "",
+                    name: item["NOMBRE COMPLETO"] || "",
+                    cargo: item["CARGO"] || "",
+                    area: item["AREA"] || item["DEPENDENCIA CARGO"] || "",
+                    city: item["CIUDAD"] || "",
+                    date: item["FECHA INGRESO"] || item["FECHA DE INGRESO"] || "",
+                    bday: item["FECHA DE NACIMIENTO"] || item["FECHA NACIMIENTO"] || item["NACIMIENTO"] || item["CUMPLEAÑOS"] || "",
+                    status: item["ACTIVO/INACTIVO"] || item["ESTADO"] || item["ACTIVO"] || ""
+                })).filter(item => item.id !== "");
 
-        function poblarCargosSelect() {
-            const cargos = [...new Set(allData.map(item => item["CARGO"]).filter(Boolean))].sort();
-            const select = document.getElementById('cargoSelect');
-            const valorActual = select.value;
-            select.innerHTML = '<option value="">Todos los Cargos</option>';
-            cargos.forEach(cargo => {
-                let opt = document.createElement('option');
-                opt.value = cargo;
-                opt.textContent = cargo;
-                select.appendChild(opt);
-            });
-            select.value = valorActual;
-        }
-
-        function setEstadoFiltro(estado) {
-            estadoFiltroActual = estado;
-            ['TODOS', 'ACTIVO', 'INACTIVO'].forEach(e => {
-                let btn = document.getElementById('btn' + e.charAt(0) + e.slice(1).toLowerCase());
-                if (e === estado) {
-                    btn.className = "flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold transition shadow-sm";
-                } else {
-                    btn.className = "flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-200 transition";
-                }
-            });
-            filtrarDatos();
-        }
-
-        function filtrarDatos() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const cargoFiltro = document.getElementById('cargoSelect').value;
-            const tipoFiltro = document.getElementById('tipoFiltro').value;
-
-            const fechaActualObj = new Date();
-            const anioActual = fechaActualObj.getFullYear();
-            const mesActual = String(fechaActualObj.getMonth() + 1).padStart(2, '0');
-            const mesActualStr = `${anioActual}-${mesActual}`;
-
-            filteredData = allData.filter(item => {
-                const id = (item["IDENTIFICACION"] || "").toString().toLowerCase();
-                const nombre = (item["NOMBRE COMPLETO"] || "").toString().toLowerCase();
-                const cargo = (item["CARGO"] || "").toString();
-                const estado = item["ESTADO"] || "";
-                const fechaRenuncia = item["FECHA RENUNCIA"] || "";
-                const fechaIngreso = item["FECHA INGRESO"] ? item["FECHA INGRESO"].toString().substring(0, 10) : "";
-
-                let matchQuery = true;
-                if (query !== "") {
-                    const matchId = id.includes(query);
-                    const matchNombre = nombre.includes(query);
-                    matchQuery = matchId || matchNombre;
-                }
-
-                let matchEstado = (estadoFiltroActual === 'TODOS' || estado === estadoFiltroActual);
-                let matchCargo = (cargoFiltro === "" || cargo === cargoFiltro);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('syncStatus').innerHTML = `<span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">● Sincronizado (${rawData.length} Registros)</span>`;
                 
-                let matchTipo = true;
-                if (tipoFiltro === "INGRESO") {
-                    matchTipo = (fechaIngreso !== "");
-                } else if (tipoFiltro === "MES_ACTUAL") {
-                    matchTipo = fechaIngreso.startsWith(mesActualStr);
-                } else if (tipoFiltro === "RETIRO") {
-                    matchTipo = (fechaRenuncia !== "" && fechaRenuncia !== null);
-                }
+                initDropdowns();
+                updateDashboardGeneral();
+                renderListadoGeneralActivos();
+                applyFilters();
 
-                return matchQuery && matchEstado && matchCargo && matchTipo;
-            });
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+                document.getElementById('exportStart').value = `${y}-${m}-01`;
+                document.getElementById('exportEnd').value = `${y}-${m}-${lastDay}`;
+                document.getElementById('bDayStart').value = `${y}-09-01`;
+                document.getElementById('bDayEnd').value = `${y}-09-30`;
 
-            actualizarKPIs();
-            actualizarTabla();
-            actualizarGraficos();
-        }
-
-        function actualizarKPIs() {
-            const total = allData.length;
-            const activos = allData.filter(i => i["ESTADO"] === "ACTIVO").length;
-            const inactivos = allData.filter(i => i["ESTADO"] === "INACTIVO").length;
-            const cargosUnicos = new Set(allData.map(i => i["CARGO"]).filter(Boolean)).size;
-
-            document.getElementById('kpiTotal').textContent = total;
-            document.getElementById('kpiActivos').textContent = activos;
-            document.getElementById('kpiInactivos').textContent = inactivos;
-            document.getElementById('kpiCargos').textContent = cargosUnicos;
-            document.getElementById('contadorRegistros').textContent = filteredData.length;
-        }
-
-        function actualizarTabla() {
-            const tbody = document.getElementById('tablaCuerpo');
-            if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-gray-500">No se encontraron registros con los filtros seleccionados.</td></tr>';
-                return;
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('syncStatus').innerHTML = '<span class="text-xs bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-medium">❌ Error al procesar datos</span>';
             }
+        };
 
-            let html = '';
-            filteredData.forEach(item => {
-                const estadoBadge = item["ESTADO"] === "ACTIVO" 
-                    ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full font-medium">Activo</span>'
-                    : '<span class="px-2 py-1 bg-rose-100 text-rose-700 rounded-full font-medium">Inactivo</span>';
+        function initDropdowns() {
+            const areas = [...new Set(rawData.map(item => item.area).filter(Boolean))].sort();
+            const cargos = [...new Set(rawData.map(item => item.cargo).filter(Boolean))].sort();
 
-                html += `<tr class="hover:bg-gray-50 transition">
-                    <td class="p-3 font-mono font-medium">${item["IDENTIFICACION"] || ""}</td>
-                    <td class="p-3 font-semibold text-gray-900">${item["NOMBRE COMPLETO"] || ""}</td>
-                    <td class="p-3">${item["CARGO"] || ""}</td>
-                    <td class="p-3 text-gray-600">${item["FECHA INGRESO"] ? item["FECHA INGRESO"].toString().substring(0,10) : ""}</td>
-                    <td class="p-3 text-gray-600">${item["ULTIMO CONTRATO"] ? item["ULTIMO CONTRATO"].toString().substring(0,10) : "-"}</td>
-                    <td class="p-3 text-gray-600">${item["FECHA RENUNCIA"] ? item["FECHA RENUNCIA"].toString().substring(0,10) : "-"}</td>
-                    <td class="p-3 text-gray-600 font-medium">${item["OBSERVACION RENUNCIA"] || item["MOTIVO"] || "-"}</td>
-                    <td class="p-3 text-center">${estadoBadge}</td>
-                </tr>`;
+            const areaSelect = document.getElementById('filterArea');
+            areas.forEach(a => {
+                let opt = document.createElement('option');
+                opt.value = a; opt.textContent = a;
+                areaSelect.appendChild(opt);
             });
-            tbody.innerHTML = html;
+
+            const cargoSelect = document.getElementById('filterCargo');
+            cargos.forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c; opt.textContent = c;
+                cargoSelect.appendChild(opt);
+            });
         }
 
-        function actualizarGraficos() {
-            const fechasConteo = {};
-            filteredData.forEach(item => {
-                let fIng = item["FECHA INGRESO"] ? item["FECHA INGRESO"].toString().substring(0,10) : null;
-                if (fIng && fIng.length >= 10) {
-                    fechasConteo[fIng] = (fechasConteo[fIng] || 0) + 1;
-                }
+        function parseDateStandard(dateStr) {
+            if (!dateStr) return null;
+            let dPart = dateStr.split(' ')[0].trim();
+            if (dPart.includes('-')) {
+                let p = dPart.split('-');
+                if (p[0].length === 4) return dPart;
+                return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+            } else if (dPart.includes('/')) {
+                let p = dPart.split('/');
+                if (p[2].length === 4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+                else if (p[0].length === 4) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`;
+            }
+            else if (!isNaN(dPart) && dPart !== "") {
+                let excelDate = new Date((dPart - (25567 + 2))*86400*1000);
+                let y = excelDate.getUTCFullYear();
+                let m = String(excelDate.getUTCMonth() + 1).padStart(2, '0');
+                let d = String(excelDate.getUTCDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return null;
+        }
+
+        function updateDashboardGeneral() {
+            document.getElementById('kpiTotal').textContent = rawData.length;
+            document.getElementById('kpiActivos').textContent = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO').length;
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const yearMonthStr = `${year}-${month}`;
+            
+            let ingresosMesList = rawData.filter(i => {
+                if (!i.date) return false;
+                let d = parseDateStandard(i.date);
+                return d && d.startsWith(yearMonthStr);
             });
 
-            const fechasOrdenadas = Object.keys(fechasConteo).sort();
-            const valoresConteo = fechasOrdenadas.map(f => fechasConteo[f]);
+            document.getElementById('kpiIngresosMes').textContent = ingresosMesList.length;
+            document.getElementById('kpiAreas').textContent = [...new Set(rawData.map(i => i.area).filter(Boolean))].length;
 
-            const ctxEvo = document.getElementById('chartEvolucion').getContext('2d');
-            if (chartEvoInstance) chartEvoInstance.destroy();
+            let cargosMesCount = {};
+            ingresosMesList.forEach(i => {
+                let c = i.cargo || 'Sin Cargo';
+                cargosMesCount[c] = (cargosMesCount[c] || 0) + 1;
+            });
 
-            chartEvoInstance = new Chart(ctxEvo, {
-                type: 'line',
+            let areasMesCount = {};
+            ingresosMesList.forEach(i => {
+                let a = i.area || 'Sin Área';
+                areasMesCount[a] = (areasMesCount[a] || 0) + 1;
+            });
+
+            renderDoughnutChart('chartCargoMes', 'Ingresos por Cargo', Object.keys(cargosMesCount), Object.values(cargosMesCount), chartCargoInstance, (inst) => chartCargoInstance = inst);
+            renderDoughnutChart('chartAreaMes', 'Ingresos por Área', Object.keys(areasMesCount), Object.values(areasMesCount), chartAreaInstance, (inst) => chartAreaInstance = inst);
+        }
+
+        function renderDoughnutChart(canvasId, labelTitle, labels, dataVals, instance, setInstance) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (instance) instance.destroy();
+            
+            let newInstance = new Chart(ctx, {
+                type: 'doughnut',
                 data: {
-                    labels: fechasOrdenadas,
+                    labels: labels,
                     datasets: [{
-                        label: 'Ingresos Diarios',
-                        data: valoresConteo,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#2563eb'
+                        label: labelTitle,
+                        data: dataVals,
+                        backgroundColor: [
+                            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
+                            '#f72585', '#b5179e', '#7209b7', '#10b981', '#f59e0b'
+                        ]
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: '#f3f4f6' } },
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f3f4f6' } }
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
                     }
                 }
             });
-
-            const cargosConteo = {};
-            filteredData.forEach(item => {
-                let c = item["CARGO"] || "OTRO";
-                cargosConteo[c] = (cargosConteo[c] || 0) + 1;
-            });
-
-            const topCargos = Object.entries(cargosConteo).sort((a,b) => b[1] - a[1]).slice(0, 6);
-            const labelsCargos = topCargos.map(i => i[0]);
-            const dataCargos = topCargos.map(i => i[1]);
-
-            const ctxCargos = document.getElementById('chartCargos').getContext('2d');
-            if (chartCargosInstance) chartCargosInstance.destroy();
-
-            chartCargosInstance = new Chart(ctxCargos, {
-                type: 'bar',
-                data: {
-                    labels: labelsCargos,
-                    datasets: [{
-                        label: 'Personal por Cargo',
-                        data: dataCargos,
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { beginAtZero: true, ticks: { precision: 0 } }
-                    }
-                }
-            });
+            setInstance(newInstance);
         }
 
-        function exportarExcel() {
-            if (filteredData.length === 0) {
-                alert("No hay datos para exportar.");
+        function matchInitials(fullName, query) {
+            if (!query) return true;
+            const cleanQuery = query.toLowerCase().trim().replace(/\s+/g, ' ');
+            const cleanName = fullName.toLowerCase();
+            if (cleanName.includes(cleanQuery)) return true;
+
+            const queryParts = cleanQuery.split(' ');
+            const nameWords = cleanName.split(' ');
+            let wordIndex = 0;
+            for (let qPart of queryParts) {
+                let found = false;
+                while (wordIndex < nameWords.length) {
+                    if (nameWords[wordIndex].startsWith(qPart)) {
+                        found = true;
+                        wordIndex++;
+                        break;
+                    }
+                    wordIndex++;
+                }
+                if (!found) return false;
+            }
+            return true;
+        }
+
+        function applyFilters() {
+            const docVal = document.getElementById('filterDoc').value.toLowerCase().trim();
+            const nameVal = document.getElementById('filterName').value;
+            const areaVal = document.getElementById('filterArea').value;
+            const cargoVal = document.getElementById('filterCargo').value;
+
+            currentDynamicFiltered = rawData.filter(item => {
+                const matchDoc = docVal === '' || item.id.toLowerCase().includes(docVal);
+                const matchName = matchInitials(item.name, nameVal);
+                const matchArea = areaVal === '' || item.area === areaVal;
+                const matchCargo = cargoVal === '' || item.cargo === cargoVal;
+                return matchDoc && matchName && matchArea && matchCargo;
+            });
+
+            renderDynamicTable(currentDynamicFiltered);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterDoc').value = '';
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterArea').value = '';
+            document.getElementById('filterCargo').value = '';
+            applyFilters();
+        }
+
+        function renderDynamicTable(data) {
+            const tbody = document.getElementById('dynamicTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('dynamicCount').textContent = `Mostrando ${data.length} de ${rawData.length} registros`;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No se encontraron registros con los filtros seleccionados.</td></tr>`;
                 return;
             }
 
-            const headers = Object.keys(filteredData[0]);
-            let csvContent = "\ufeff" + headers.join(",") + "\n";
+            const limit = data.length > 300 ? 300 : data.length;
+            for (let i = 0; i < limit; i++) {
+                let item = data[i];
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                let displayDate = item.date ? item.date.split(' ')[0] : 'N/A';
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-medium text-slate-900">${item.id}</td>
+                    <td class="px-6 py-3 font-semibold text-slate-800">${item.name}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.cargo}</td>
+                    <td class="px-6 py-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
+                    <td class="px-6 py-3 text-slate-600">${item.city || 'N/A'}</td>
+                    <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayDate}</td>
+                    <td class="px-6 py-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide ${item.status.toUpperCase() === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">
+                            ${item.status || 'N/D'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
 
-            filteredData.forEach(item => {
-                let row = headers.map(h => {
-                    let val = item[h] !== null && item[h] !== undefined ? item[h].toString() : "";
-                    if (val.includes(",") || val.includes("\n") || val.includes('"')) {
-                        val = '"' + val.replace(/"/g, '""') + '"';
-                    }
-                    return val;
+        function exportFilteredData(format) {
+            if (currentDynamicFiltered.length === 0) {
+                alert("No hay datos filtrados para exportar.");
+                return;
+            }
+
+            if (format === 'pdf') {
+                window.print();
+            } else if (format === 'excel') {
+                let csvRows = [];
+                csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
+                currentDynamicFiltered.forEach(item => {
+                    csvRows.push([
+                        `"${item.id}"`,
+                        `"${(item.name || '').replace(/"/g, '""')}"`,
+                        `"${(item.cargo || '').replace(/"/g, '""')}"`,
+                        `"${(item.area || '').replace(/"/g, '""')}"`,
+                        `"${(item.city || '').replace(/"/g, '""')}"`,
+                        `"${item.date ? item.date.split(' ')[0] : ''}"`,
+                        `"${item.status}"`
+                    ].join(','));
                 });
-                csvContent += row.join(",") + "\n";
+                downloadBlob(csvRows, 'Reporte_Filtros_Dinamicos.csv');
+            } else if (format === 'word') {
+                let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>Reporte Word</title></head><body>
+                <h2>Reporte de Colaboradores - Filtros Dinámicos</h2>
+                <table border='1' cellspacing='0' cellpadding='5'>
+                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre Completo</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Fecha Ingreso</th><th>Estado</th></tr>`;
+                
+                currentDynamicFiltered.forEach(item => {
+                    htmlContent += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.cargo}</td><td>${item.area}</td><td>${item.city}</td><td>${item.date}</td><td>${item.status}</td></tr>`;
+                });
+                htmlContent += `</table></body></html>`;
+
+                let blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = 'Reporte_Filtros_Dinamicos.doc';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        }
+
+        // CUMPLEAÑOS ORDENADO ASCENDENTEMENTE CON FORMATO DD/MM/AÑO_ACTUAL
+        function buscarCumpleanos() {
+            const startStr = document.getElementById('bDayStart').value; 
+            const endStr = document.getElementById('bDayEnd').value;
+            const tbody = document.getElementById('bDayTableBody');
+            tbody.innerHTML = '';
+
+            if(!startStr || !endStr) {
+                alert("Selecciona un rango de fechas válido.");
+                return;
+            }
+
+            let [, startM, startD] = startStr.split('-');
+            let [, endM, endD] = endStr.split('-');
+            let startVal = parseInt(startM + startD, 10);
+            let endVal = parseInt(endM + endD, 10);
+            let currentYear = new Date().getFullYear(); // Año actual dinámico
+
+            currentBDayFiltered = rawData.filter(item => {
+                if(!item.bday) return false;
+                let std = parseDateStandard(item.bday);
+                if(!std) return false;
+                let [, m, d] = std.split('-');
+                let itemVal = parseInt(m + d, 10);
+                return itemVal >= startVal && itemVal <= endVal;
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'Reporte_Personal_GitHub.csv');
+            currentBDayFiltered.sort((a, b) => {
+                let stdA = parseDateStandard(a.bday);
+                let stdB = parseDateStandard(b.bday);
+                let [, mA, dA] = stdA.split('-');
+                let [, mB, dB] = stdB.split('-');
+                return parseInt(mA + dA, 10) - parseInt(mB + dB, 10);
+            });
+
+            if(currentBDayFiltered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">No se encontraron cumpleaños en este rango.</td></tr>`;
+                return;
+            }
+
+            currentBDayFiltered.forEach(item => {
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                
+                // Extraer Día y Mes de la fecha de nacimiento y asignarle el año actual (Ej: 16/09/2026)
+                let std = parseDateStandard(item.bday);
+                let [, m, d] = std.split('-');
+                let fechaCumpleanosActual = `${d}/${m}/${currentYear}`;
+
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-semibold text-slate-800">${item.name}</td>
+                    <td class="px-6 py-3 text-slate-600">${fechaCumpleanosActual}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.cargo || 'N/A'}</td>
+                    <td class="px-6 py-3 text-slate-600"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportarCumpleanosExcel() {
+            if(currentBDayFiltered.length === 0) {
+                alert("No hay datos de cumpleaños para exportar.");
+                return;
+            }
+            let currentYear = new Date().getFullYear();
+            let csvRows = [['NOMBRE COMPLETO', 'FECHA CUMPLEAÑOS', 'CARGO', 'AREA'].join(',')];
+            
+            currentBDayFiltered.forEach(item => {
+                let std = parseDateStandard(item.bday);
+                let [, m, d] = std.split('-');
+                let fechaCumpleanosActual = `${d}/${m}/${currentYear}`;
+
+                csvRows.push([
+                    `"${(item.name || '').replace(/"/g, '""')}"`,
+                    `"${fechaCumpleanosActual}"`,
+                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
+                    `"${(item.area || '').replace(/"/g, '""')}"`
+                ].join(','));
+            });
+            downloadBlob(csvRows, 'Reporte_Cumpleanos_Ascendente.csv');
+        }
+
+        function renderListadoGeneralActivos() {
+            const activos = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO');
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            document.getElementById('tableCount').textContent = `Mostrando ${activos.length} colaboradores activos`;
+
+            if (activos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No hay personal activo registrado.</td></tr>`;
+                return;
+            }
+
+            const limit = activos.length > 300 ? 300 : activos.length;
+            for (let i = 0; i < limit; i++) {
+                let item = activos[i];
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                let displayDate = item.date ? item.date.split(' ')[0] : 'N/A';
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-medium text-slate-900">${item.id}</td>
+                    <td class="px-6 py-3 font-semibold text-slate-800">${item.name}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.cargo}</td>
+                    <td class="px-6 py-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
+                    <td class="px-6 py-3 text-slate-600">${item.city || 'N/A'}</td>
+                    <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayDate}</td>
+                    <td class="px-6 py-3">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-700">
+                            ${item.status}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function previsualizarExportacion() {
+            const startStr = document.getElementById('exportStart').value;
+            const endStr = document.getElementById('exportEnd').value;
+            const statusDiv = document.getElementById('exportStatus');
+            const tbody = document.getElementById('previewTableBody');
+            const btnExport = document.getElementById('btnRealizarExport');
+            tbody.innerHTML = '';
+
+            if (!startStr || !endStr) {
+                statusDiv.innerHTML = '<span class="text-rose-600">⚠️ Por favor selecciona ambas fechas.</span>';
+                return;
+            }
+
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+
+            currentExportFiltered = rawData.filter(item => {
+                let std = parseDateStandard(item.date);
+                if (!std) return false;
+                let itemDate = new Date(std);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+
+            document.getElementById('previewCount').textContent = `${currentExportFiltered.length} registros en el rango seleccionado`;
+
+            if (currentExportFiltered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-6 text-center text-slate-400">No se encontraron registros en este rango.</td></tr>`;
+                btnExport.disabled = true;
+                btnExport.classList.add('opacity-50', 'cursor-not-allowed');
+                return;
+            }
+
+            currentExportFiltered.forEach(item => {
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-4 py-2 font-medium text-slate-900">${item.id}</td>
+                    <td class="px-4 py-2 font-semibold text-slate-800">${item.name}</td>
+                    <td class="px-4 py-2 text-slate-600">${item.cargo}</td>
+                    <td class="px-4 py-2">${item.area || 'N/A'}</td>
+                    <td class="px-4 py-2">${item.city || 'N/A'}</td>
+                    <td class="px-4 py-2">${item.date ? item.date.split(' ')[0] : 'N/A'}</td>
+                    <td class="px-4 py-2">${item.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            btnExport.disabled = false;
+            btnExport.classList.remove('opacity-50', 'cursor-not-allowed');
+            statusDiv.innerHTML = '<span class="text-emerald-600">✅ Vista previa cargada correctamente. Ya puedes exportar.</span>';
+        }
+
+        function ejecutarExportacionCSV() {
+            if (currentExportFiltered.length === 0) return;
+
+            let csvRows = [];
+            csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
+
+            currentExportFiltered.forEach(item => {
+                let row = [
+                    `"${item.id || ''}"`,
+                    `"${(item.name || '').replace(/"/g, '""')}"`,
+                    `"${(item.cargo || '').replace(/"/g, '""')}"`,
+                    `"${(item.area || '').replace(/"/g, '""')}"`,
+                    `"${(item.city || '').replace(/"/g, '""')}"`,
+                    `"${item.date ? item.date.split(' ')[0] : ''}"`,
+                    `"${item.status || ''}"`
+                ];
+                csvRows.push(row.join(','));
+            });
+
+            const startStr = document.getElementById('exportStart').value;
+            const endStr = document.getElementById('exportEnd').value;
+            downloadBlob(csvRows, `Colaboradores_Ingresos_${startStr}_al_${endStr}.csv`);
+        }
+
+        function downloadBlob(rowsArray, filename) {
+            let csvBlob = new Blob(["\ufeff" + rowsArray.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            let url = URL.createObjectURL(csvBlob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
