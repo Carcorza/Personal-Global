@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (XLSX) para exportar a Excel en formato de celdas real con ajuste de texto -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -235,9 +237,7 @@
                         </div>
                     </div>
 
-                    <!-- FILA INFERIOR: GRÁFICO BIZCOCHO AL LADO DEL NUEVO GRÁFICO DE BARRAS POR ÁREA -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Cuadro 3: Bizcocho de Contratos -->
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Distribución por Tipo de Contrato (Activos)</h3>
@@ -246,7 +246,6 @@
                             <div class="h-72 w-full flex justify-center"><canvas id="chartTipoContratoActivo"></canvas></div>
                         </div>
 
-                        <!-- Cuadro 4 (Nuevo): Gráfico de Barras por Área con Desplegable -->
                         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
                             <div class="flex justify-between items-center gap-2 flex-wrap">
                                 <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wide">Cargos por Área (Activos)</h3>
@@ -259,7 +258,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 2: FILTROS DINÁMICOS -->
+                <!-- PESTAÑA: FILTRO PERSONAL -->
                 <div id="content-filters" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex justify-between items-center">
@@ -312,6 +311,9 @@
                                         <th class="px-6 py-3">Área</th>
                                         <th class="px-6 py-3">Ciudad</th>
                                         <th class="px-6 py-3">Fecha Ingreso</th>
+                                        <th class="px-6 py-3">Fecha Último Contrato</th>
+                                        <th class="px-6 py-3">Fecha Renuncia</th>
+                                        <th class="px-6 py-3">Observación Renuncia</th>
                                         <th class="px-6 py-3">Estado</th>
                                     </tr>
                                 </thead>
@@ -321,16 +323,45 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA NUEVA: PERSONAL PENDIENTE (CON OPCIÓN DE VER CON/SIN CIUDAD) -->
+                <!-- NUEVA PESTAÑA: INFORMACIÓN PERSONAL (TARJETAS / TEXTBOXES) -->
+                <div id="content-info-personal" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-bold text-slate-800 text-base">Consulta de Información Personal por Funcionario</h3>
+                        <p class="text-xs text-slate-500">Busca por número de cédula o nombre completo para ver la ficha detallada con todos sus datos.</p>
+                        
+                        <div class="flex flex-wrap items-end gap-3">
+                            <div class="flex-1 min-w-[260px]">
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Cédula o Nombre del Funcionario</label>
+                                <input type="text" id="searchInfoInput" placeholder="Ej. 1022946672 o Carlos..." class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <button onclick="buscarInformacionPersonal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 px-6 rounded-lg transition shadow-sm">
+                                🔍 Buscar Funcionario
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor de Fichas / Tarjetas de Resultado -->
+                    <div id="infoPersonalResultContainer" class="space-y-6">
+                        <div class="bg-white p-12 rounded-xl border border-slate-200 shadow-sm text-center text-slate-400">
+                            Por favor ingresa una cédula o nombre y haz clic en Buscar para visualizar la información del funcionario.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA: PERSONAL PENDIENTE -->
                 <div id="content-pendientes" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex flex-wrap justify-between items-center gap-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base">Informe de Necesidad - Personal Pendiente (P_PEND)</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Alterna la vista para incluir o excluir el desglose por ciudad.</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Filtra por área o alterna la vista para incluir o excluir el desglose por ciudad.</p>
                             </div>
                             <div class="flex items-center gap-3 flex-wrap">
-                                <!-- Botón selector de vista con/sin ciudad -->
+                                <div class="w-48">
+                                    <select id="filterPendArea" onchange="renderPendientesTable()" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white font-medium text-slate-700">
+                                        <option value="">Todas las Áreas</option>
+                                    </select>
+                                </div>
                                 <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200 text-xs font-medium">
                                     <button id="btnModoSinCiudad" onclick="cambiarModoCiudad(false)" class="px-3 py-1.5 rounded-lg transition bg-white text-slate-800 shadow-sm">Sin Ciudad</button>
                                     <button id="btnModoConCiudad" onclick="cambiarModoCiudad(true)" class="px-3 py-1.5 rounded-lg transition text-slate-600 hover:text-slate-900">Con Ciudad</button>
@@ -346,55 +377,9 @@
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto max-h-[600px]">
                             <table class="w-full text-left border-collapse sticky top-0">
-                                <thead id="pendTableHead" class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
-                                    <!-- Se genera dinámicamente según el modo -->
-                                </thead>
+                                <thead id="pendTableHead" class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider"></thead>
                                 <tbody id="pendTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
                                     <tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">Cargando datos de P_PEND...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PESTAÑA 3: CUMPLEAÑOS -->
-                <div id="content-birthdays" class="tab-content space-y-6">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
-                                <input type="date" id="bDayStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
-                                <input type="date" id="bDayEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            </div>
-                            <div>
-                                <button onclick="buscarCumpleanos()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
-                                    🔍 Consultar Cumpleaños
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños</h3>
-                            <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel</button>
-                        </div>
-                        <div class="overflow-x-auto max-h-[500px]">
-                            <table class="w-full text-left border-collapse sticky top-0">
-                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
-                                    <tr>
-                                        <th class="px-6 py-3">Nombre Completo</th>
-                                        <th class="px-6 py-3">Fecha Nacimiento</th>
-                                        <th class="px-6 py-3">Cargo</th>
-                                        <th class="px-6 py-3">Área</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bDayTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
-                                    <tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">Selecciona un rango y haz clic en Consultar.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -432,10 +417,10 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 5: MÓDULO DE EXPORTACIÓN -->
+                <!-- MÓDULO DE CONTRATACIÓN -->
                 <div id="content-export" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Exportación Avanzada</h3>
+                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Contratación</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
@@ -468,11 +453,11 @@
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden space-y-4 p-6">
                         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
                             <div>
-                                <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Exportar</h3>
+                                <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Contratación</h3>
                                 <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros</span>
                             </div>
-                            <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
-                                📥 Descargar Excel / CSV
+                            <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
+                                📥 Descargar Excel Profesional
                             </button>
                         </div>
                         <div class="overflow-x-auto max-h-[400px]">
@@ -497,6 +482,102 @@
                     </div>
                 </div>
 
+                <!-- MÓDULO DE RETIROS -->
+                <div id="content-retiros" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-semibold text-slate-800 text-sm">Módulo de Retiros (Filtrar por Rango de Fecha de Retiro)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde (Retiro)</label>
+                                <input type="date" id="retStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta (Retiro)</label>
+                                <input type="date" id="retEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <button onclick="buscarRetiros()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
+                                    🔍 Consultar Retiros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
+                            <div>
+                                <h3 class="font-semibold text-slate-800 text-sm">Listado de Personal Retirado</h3>
+                                <span id="retCount" class="text-xs text-slate-500 font-medium">0 registros encontrados</span>
+                            </div>
+                            <button onclick="exportarRetirosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel Profesional de Retiros</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3">Documento</th>
+                                        <th class="px-6 py-3">Nombre Completo</th>
+                                        <th class="px-6 py-3">Cargo</th>
+                                        <th class="px-6 py-3">Área</th>
+                                        <th class="px-6 py-3">Ciudad</th>
+                                        <th class="px-6 py-3">Fecha Ingreso</th>
+                                        <th class="px-6 py-3">Fecha Renuncia (Retiro)</th>
+                                        <th class="px-6 py-3">Observación Renuncia</th>
+                                        <th class="px-6 py-3">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="retTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <tr><td colspan="9" class="px-6 py-6 text-center text-slate-400">Selecciona un rango de fechas y haz clic en Consultar.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUMPLEAÑOS -->
+                <div id="content-birthdays" class="tab-content space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="font-semibold text-slate-800 text-sm">Filtro por Fecha de Nacimiento (Cumpleaños)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Desde</label>
+                                <input type="date" id="bDayStart" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Fecha Hasta</label>
+                                <input type="date" id="bDayEnd" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <button onclick="buscarCumpleanos()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition shadow-sm">
+                                    🔍 Consultar Cumpleaños
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                            <h3 class="font-semibold text-slate-800 text-sm">Listado de Cumpleaños</h3>
+                            <button onclick="exportarCumpleanosExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition shadow-sm">📊 Descargar Excel Profesional</button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left border-collapse sticky top-0">
+                                <thead class="bg-slate-50 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-6 py-3">Nombre Completo</th>
+                                        <th class="px-6 py-3">Fecha Nacimiento</th>
+                                        <th class="px-6 py-3">Cargo</th>
+                                        <th class="px-6 py-3">Área</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bDayTableBody" class="divide-y divide-slate-200 text-xs text-slate-700">
+                                    <tr><td colspan="4" class="px-6 py-6 text-center text-slate-400">Selecciona un rango y haz clic en Consultar.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -510,12 +591,14 @@
         const appsScriptURL = 'https://script.google.com/macros/s/AKfycbwXoixFi07-aesobxOfS6Fq5HX4SqnLyYZdxXjTTHDwxrUYNiqIlgF-OxPHTknpcusi/exec';
 
         let rawData = [];
-        let pendData = []; // Datos de la pestaña P_Pend
-        let mostrarConCiudad = false; // Estado inicial: Sin Ciudad
+        let rawObjectsFull = []; // Almacena los objetos originales completos con todas sus columnas de Google Sheets
+        let pendData = [];
+        let mostrarConCiudad = false;
         let permisosActuales = {};
         let currentDynamicFiltered = [];
         let currentExportFiltered = [];
         let currentBDayFiltered = [];
+        let currentRetFiltered = [];
         let chartEvolucionMesInstance = null;
         let chartCargosMesInstance = null;
         let chartTipoContratoInstance = null;
@@ -523,11 +606,13 @@
 
         const tabMapping = [
             { id: 'dashboard', name: 'Vista General', icon: '📊', possibleCols: ['VISTA GENERAL', 'VISTAGENERAL'] },
-            { id: 'filters', name: 'Filtros Dinámicos', icon: '🔍', possibleCols: ['FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
+            { id: 'filters', name: 'Filtro Personal', icon: '🔍', possibleCols: ['FILTRO PERSONAL', 'FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
+            { id: 'info-personal', name: 'Información Personal', icon: '📇', possibleCols: ['INFORMACION PERSONAL', 'INFORMACIÓN PERSONAL', 'INFO PERSONAL'] },
             { id: 'pendientes', name: 'Personal Pendiente', icon: '📈', possibleCols: ['PERSONAL PENDIENTE', 'PENDIENTES', 'P_PEND', 'VISTAGENERAL'] },
-            { id: 'birthdays', name: 'Cumpleaños', icon: '🎂', possibleCols: ['CUMPLEAÑOS', 'CUMPLEANOS'] },
             { id: 'table', name: 'Listado General', icon: '📋', possibleCols: ['LISTADO GENERAL', 'LISTADOGENERAL'] },
-            { id: 'export', name: 'Módulo de Exportación', icon: '📥', possibleCols: ['MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] }
+            { id: 'export', name: 'Módulo de Contratación', icon: '📥', possibleCols: ['MODULO CONTRATACION', 'MODULO CONTRATACIÓN', 'MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] },
+            { id: 'retiros', name: 'Módulo de Retiros', icon: '🚪', possibleCols: ['RETIROS', 'PERSONAL RETIRADO', 'RETIRADOS'] },
+            { id: 'birthdays', name: 'Cumpleaños', icon: '🎂', possibleCols: ['CUMPLEAÑOS', 'CUMPLEANOS'] }
         ];
 
         window.onload = () => {
@@ -861,7 +946,7 @@
                 tab.possibleCols.forEach(cName => {
                     let val1 = (permisosActuales[cName] || '').toUpperCase();
                     let val2 = (permisosActuales[cName.normalize("NFD").replace(/[\u0300-\u036f]/g, "")] || '').toUpperCase();
-                    if(val1 === 'SI' || val2 === 'SI') {
+                    if(val1 === 'SI' || val2 === 'SI' || tab.id === 'info-personal') { // Permitir por defecto si está la pestaña nueva o tiene permiso explícito
                         tienePermiso = true;
                     }
                 });
@@ -906,8 +991,8 @@
                 let btnD = document.getElementById(`btn-d-${t.id}`);
                 if(btnD) btnD.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 font-medium text-sm transition";
                 
-                let btnM = document.getElementById(`btn-m-${t.id}`);
-                if(btnM) btnM.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
+                let btnM_loop = document.getElementById(`btn-m-${t.id}`);
+                if(btnM_loop) btnM_loop.className = "whitespace-nowrap px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-slate-300 font-medium text-xs transition shadow-sm flex items-center gap-2 shrink-0 border border-slate-700/50";
             });
 
             const activeContent = document.getElementById(`content-${tabName}`);
@@ -946,32 +1031,42 @@
                 const cols = response.table.cols.map(col => col ? (col.label || '').trim().toUpperCase() : '');
                 const rows = response.table.rows;
 
-                rawData = rows.map(row => {
+                rawObjectsFull = rows.map(row => {
                     let obj = {};
                     if (row && row.c) {
                         row.c.forEach((cell, index) => {
                             let colName = cols[index];
                             if (colName) {
                                 let val = cell ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '')) : '';
-                                let cleanKey = colName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                                obj[cleanKey] = String(val).trim();
+                                obj[colName.trim().toUpperCase()] = String(val).trim();
                             }
                         });
                     }
                     return obj;
                 });
 
-                rawData = rawData.map(item => ({
-                    id: item["IDENTIFICACION"] || item["DOCUMENTO"] || "",
-                    name: item["NOMBRE COMPLETO"] || "",
-                    cargo: item["CARGO"] || "",
-                    area: item["AREA"] || item["DEPENDENCIA CARGO"] || "",
-                    city: item["CIUDAD"] || "",
-                    date: item["FECHA INGRESO"] || item["FECHA DE INGRESO"] || "",
-                    bday: item["FECHA DE NACIMIENTO"] || item["FECHA NACIMIENTO"] || item["NACIMIENTO"] || item["CUMPLEAÑOS"] || "",
-                    status: item["ACTIVO/INACTIVO"] || item["ESTADO"] || item["ACTIVO"] || "",
-                    contrato: item["TIPO CONTRATO"] || item["TIPO DE CONTRATO"] || item["CONTRATO"] || "NO ESPECIFICADO"
-                })).filter(item => item.id !== "");
+                rawData = rawObjectsFull.map(item => {
+                    let cleanObj = {};
+                    for(let key in item) {
+                        let cleanKey = key.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                        cleanObj[cleanKey] = item[key];
+                    }
+                    return {
+                        original: item, // Guardamos todas las columnas originales para la vista individual
+                        id: cleanObj["IDENTIFICACION"] || cleanObj["DOCUMENTO"] || "",
+                        name: cleanObj["NOMBRE COMPLETO"] || "",
+                        cargo: cleanObj["CARGO"] || "",
+                        area: cleanObj["AREA"] || cleanObj["DEPENDENCIA CARGO"] || "",
+                        city: cleanObj["CIUDAD"] || "",
+                        date: cleanObj["FECHA INGRESO"] || cleanObj["FECHA DE INGRESO"] || "",
+                        fechaUltimoContrato: cleanObj["FECHA ULTIMO CONTRATO"] || cleanObj["FECHA DE ULTIMO CONTRATO"] || cleanObj["ULTIMO CONTRATO"] || "",
+                        fechaRenuncia: cleanObj["FECHA RENUNCIA"] || cleanObj["FECHA DE RENUNCIA"] || "",
+                        obsRenuncia: cleanObj["OBSERVACION DE RENUNCIA"] || cleanObj["OBSERVACION RENUNCIA"] || cleanObj["OBSERVACIONES RENUNCIA"] || cleanObj["OBSERVACION"] || "",
+                        bday: cleanObj["FECHA DE NACIMIENTO"] || cleanObj["FECHA NACIMIENTO"] || cleanObj["NACIMIENTO"] || cleanObj["CUMPLEAÑOS"] || "",
+                        status: cleanObj["ACTIVO/INACTIVO"] || cleanObj["ESTADO"] || cleanObj["ACTIVO"] || "",
+                        contrato: cleanObj["TIPO CONTRATO"] || cleanObj["TIPO DE CONTRATO"] || cleanObj["CONTRATO"] || "NO ESPECIFICADO"
+                    };
+                }).filter(item => item.id !== "");
 
                 document.getElementById('loadingOverlay').classList.add('hidden');
                 if(document.getElementById('syncStatus')) {
@@ -996,6 +1091,8 @@
                 document.getElementById('exportEnd').value = ultimoDiaMes;
                 document.getElementById('bDayStart').value = primerDiaMes;
                 document.getElementById('bDayEnd').value = ultimoDiaMes;
+                document.getElementById('retStart').value = primerDiaMes;
+                document.getElementById('retEnd').value = ultimoDiaMes;
 
             } catch (error) {
                 console.error(error);
@@ -1005,6 +1102,68 @@
                 }
             }
         };
+
+        // LÓGICA DE BÚSQUEDA PARA LA NUEVA PESTAÑA INFORMACIÓN PERSONAL
+        function buscarInformacionPersonal() {
+            const query = document.getElementById('searchInfoInput').value.toLowerCase().trim();
+            const container = document.getElementById('infoPersonalResultContainer');
+            container.innerHTML = '';
+
+            if(!query) {
+                container.innerHTML = `<div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center text-rose-500 font-medium">Por favor escribe una cédula o nombre para buscar.</div>`;
+                return;
+            }
+
+            let resultados = rawData.filter(item => {
+                let matchId = item.id.toLowerCase().includes(query);
+                let matchName = item.name.toLowerCase().includes(query);
+                return matchId || matchName;
+            });
+
+            if(resultados.length === 0) {
+                container.innerHTML = `<div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center text-slate-400">No se encontró ningún funcionario con ese criterio de búsqueda.</div>`;
+                return;
+            }
+
+            resultados.forEach(item => {
+                let orig = item.original; // Todas las columnas originales de Google Sheets
+                
+                let card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-5";
+                
+                let headerHtml = `
+                    <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-4 gap-2">
+                        <div>
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${item.status.toUpperCase() === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.status || 'N/D'}</span>
+                            <h3 class="text-lg font-bold text-slate-900 mt-1">${item.name || 'Sin Nombre'}</h3>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-slate-400 block font-medium">Cédula / Documento</span>
+                            <span class="text-sm font-bold text-indigo-600">${item.id}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Recorremos dinámicamente todas las propiedades de la fila para armar cajas (textboxes visuales)
+                let fieldsHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">';
+                
+                for(let key in orig) {
+                    let val = orig[key] !== "" ? orig[key] : "No registrado";
+                    fieldsHtml += `
+                        <div class="bg-slate-50/80 p-3 rounded-xl border border-slate-200/60 flex flex-col justify-between">
+                            <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">${key}</span>
+                            <div class="text-xs font-semibold text-slate-800 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-inner select-all truncate" title="${val}">
+                                ${val}
+                            </div>
+                        </div>
+                    `;
+                }
+                fieldsHtml += '</div>';
+
+                card.innerHTML = headerHtml + fieldsHtml;
+                container.appendChild(card);
+            });
+        }
 
         function fetchPendData() {
             const jsonpURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=P_Pend&tqx=responseHandler:handlePendData`;
@@ -1046,6 +1205,18 @@
                     city: item["CIUDAD"] || "SIN CIUDAD"
                 })).filter(item => item.cargo !== "" || item.area !== "");
 
+                const areasSet = [...new Set(pendData.map(item => item.area).filter(Boolean))].sort();
+                const pendAreaSelect = document.getElementById('filterPendArea');
+                if(pendAreaSelect) {
+                    pendAreaSelect.innerHTML = '<option value="">Todas las Áreas</option>';
+                    areasSet.forEach(a => {
+                        let opt = document.createElement('option');
+                        opt.value = a;
+                        opt.textContent = a;
+                        pendAreaSelect.appendChild(opt);
+                    });
+                }
+
                 renderPendientesTable();
             } catch (error) {
                 console.error("Error procesando P_Pend:", error);
@@ -1073,6 +1244,7 @@
         function renderPendientesTable() {
             const thead = document.getElementById('pendTableHead');
             const tbody = document.getElementById('pendTableBody');
+            const areaFiltroVal = document.getElementById('filterPendArea').value;
             if(!tbody || !thead) return;
 
             thead.innerHTML = `
@@ -1083,8 +1255,13 @@
             `;
             tbody.innerHTML = '';
 
-            if (pendData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">No hay registros en la hoja P_Pend.</td></tr>`;
+            let dataFiltrada = pendData;
+            if (areaFiltroVal !== "") {
+                dataFiltrada = pendData.filter(item => (item.area || 'SIN ÁREA').toUpperCase() === areaFiltroVal.toUpperCase());
+            }
+
+            if (dataFiltrada.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="px-6 py-8 text-center text-slate-400">No hay registros para el filtro seleccionado.</td></tr>`;
                 document.getElementById('pendTotalBadge').textContent = `Total General: 0`;
                 return;
             }
@@ -1092,9 +1269,8 @@
             let totalGeneral = 0;
 
             if (!mostrarConCiudad) {
-                // MODO 1: SIN CIUDAD (Área -> Cargo)
                 let agrupado = {};
-                pendData.forEach(item => {
+                dataFiltrada.forEach(item => {
                     let area = (item.area || 'SIN ÁREA').toUpperCase();
                     let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
 
@@ -1132,9 +1308,8 @@
                 });
 
             } else {
-                // MODO 2: CON CIUDAD (Cargo -> Área -> Ciudad)
                 let agrupado = {};
-                pendData.forEach(item => {
+                dataFiltrada.forEach(item => {
                     let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
                     let area = (item.area || 'SIN ÁREA').toUpperCase();
                     let city = (item.city || 'SIN CIUDAD').toUpperCase();
@@ -1188,17 +1363,23 @@
         }
 
         function exportarPendientesExcel() {
-            if (pendData.length === 0) {
+            const areaFiltroVal = document.getElementById('filterPendArea').value;
+            let dataFiltrada = pendData;
+            if (areaFiltroVal !== "") {
+                dataFiltrada = pendData.filter(item => (item.area || 'SIN ÁREA').toUpperCase() === areaFiltroVal.toUpperCase());
+            }
+
+            if (dataFiltrada.length === 0) {
                 alert("No hay datos para exportar.");
                 return;
             }
 
+            let dataToExport = [];
             let totalGeneral = 0;
-            let csvRows = [];
 
             if (!mostrarConCiudad) {
                 let agrupado = {};
-                pendData.forEach(item => {
+                dataFiltrada.forEach(item => {
                     let area = (item.area || 'SIN ÁREA').toUpperCase();
                     let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
                     if (!agrupado[area]) agrupado[area] = { cargos: {}, total: 0 };
@@ -1208,18 +1389,18 @@
                     totalGeneral++;
                 });
 
-                csvRows.push([['ETIQUETAS DE FILA (ÁREA / CARGO)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')]);
+                dataToExport.push({ "ETIQUETAS DE FILA (ÁREA / CARGO)": "ETIQUETAS DE FILA (ÁREA / CARGO)", "CUENTA DE CARGO (NECESIDAD)": "CUENTA DE CARGO (NECESIDAD)" });
                 let areasOrdenadas = Object.keys(agrupado).sort();
                 areasOrdenadas.forEach(area => {
-                    csvRows.push([`"${area}"`, `"${agrupado[area].total}"`].join(','));
+                    dataToExport.push({ "ETIQUETAS DE FILA (ÁREA / CARGO)": area, "CUENTA DE CARGO (NECESIDAD)": agrupado[area].total });
                     let cargosOrdenados = Object.keys(agrupado[area].cargos).sort();
                     cargosOrdenados.forEach(cargo => {
-                        csvRows.push([`"    ${cargo}"`, `"${agrupado[area].cargos[cargo]}"`].join(','));
+                        dataToExport.push({ "ETIQUETAS DE FILA (ÁREA / CARGO)": `    ${cargo}`, "CUENTA DE CARGO (NECESIDAD)": agrupado[area].cargos[cargo] });
                     });
                 });
             } else {
                 let agrupado = {};
-                pendData.forEach(item => {
+                dataFiltrada.forEach(item => {
                     let cargo = (item.cargo || 'SIN CARGO').toUpperCase();
                     let area = (item.area || 'SIN ÁREA').toUpperCase();
                     let city = (item.city || 'SIN CIUDAD').toUpperCase();
@@ -1232,23 +1413,99 @@
                     totalGeneral++;
                 });
 
-                csvRows.push([['ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)', 'CUENTA DE CARGO (NECESIDAD)'].join(',')]);
+                dataToExport.push({ "ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)": "ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)", "CUENTA DE CARGO (NECESIDAD)": "CUENTA DE CARGO (NECESIDAD)" });
                 let cargosOrdenados = Object.keys(agrupado).sort();
                 cargosOrdenados.forEach(cargo => {
-                    csvRows.push([`"${cargo}"`, `"${agrupado[cargo].total}"`].join(','));
+                    dataToExport.push({ "ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)": cargo, "CUENTA DE CARGO (NECESIDAD)": agrupado[cargo].total });
                     let areasOrdenadas = Object.keys(agrupado[cargo].areas).sort();
                     areasOrdenadas.forEach(area => {
-                        csvRows.push([`"    ${area}"`, `"${agrupado[cargo].areas[area].total}"`].join(','));
+                        dataToExport.push({ "ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)": `    ${area}`, "CUENTA DE CARGO (NECESIDAD)": agrupado[cargo].areas[area].total });
                         let citiesOrdenadas = Object.keys(agrupado[cargo].areas[area].cities).sort();
                         citiesOrdenadas.forEach(city => {
-                            csvRows.push([`"        ${city}"`, `"${agrupado[cargo].areas[area].cities[city]}"`].join(','));
+                            dataToExport.push({ "ETIQUETAS DE FILA (CARGO / ÁREA / CIUDAD)": `        ${city}`, "CUENTA DE CARGO (NECESIDAD)": agrupado[cargo].areas[area].cities[city] });
                         });
                     });
                 });
             }
 
-            csvRows.push([`"Total general"`, `"${totalGeneral}"`].join(','));
-            downloadBlob(csvRows, mostrarConCiudad ? 'Informe_Personal_Pendiente_Con_Ciudad.csv' : 'Informe_Personal_Pendiente_Sin_Ciudad.csv');
+            dataToExport.push({ [Object.keys(dataToExport[0])[0]]: "Total general", [Object.keys(dataToExport[0])[1]]: totalGeneral });
+
+            exportarExcelProfesional(dataToExport, mostrarConCiudad ? 'Informe_Personal_Pendiente_Con_Ciudad.xlsx' : 'Informe_Personal_Pendiente_Sin_Ciudad.xlsx');
+        }
+
+        function buscarRetiros() {
+            const startStr = document.getElementById('retStart').value;
+            const endStr = document.getElementById('retEnd').value;
+            const tbody = document.getElementById('retTableBody');
+            tbody.innerHTML = '';
+
+            if(!startStr || !endStr) {
+                alert("Selecciona un rango de fechas de retiro válido.");
+                return;
+            }
+
+            const startDate = new Date(startStr);
+            const endDate = new Date(endStr);
+
+            currentRetFiltered = rawData.filter(item => {
+                if(!item.fechaRenuncia) return false;
+                let std = parseDateStandard(item.fechaRenuncia);
+                if(!std) return false;
+                let itemDate = new Date(std);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+
+            currentRetFiltered.sort((a, b) => {
+                let stdA = parseDateStandard(a.fechaRenuncia);
+                let stdB = parseDateStandard(b.fechaRenuncia);
+                return new Date(stdA) - new Date(stdB);
+            });
+
+            document.getElementById('retCount').textContent = `${currentRetFiltered.length} registros encontrados`;
+
+            if(currentRetFiltered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-6 text-center text-slate-400">No se encontraron retiros en este rango de fechas.</td></tr>`;
+                return;
+            }
+
+            currentRetFiltered.forEach(item => {
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                let displayIngreso = item.date ? item.date.split(' ')[0] : 'N/A';
+                let displayRetiro = item.fechaRenuncia ? item.fechaRenuncia.split(' ')[0] : 'N/A';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-3 font-medium text-slate-900">${item.id}</td>
+                    <td class="px-6 py-3 font-semibold text-slate-800">${item.name}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.cargo || 'N/A'}</td>
+                    <td class="px-6 py-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
+                    <td class="px-6 py-3 text-slate-600">${item.city || 'N/A'}</td>
+                    <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayIngreso}</td>
+                    <td class="px-6 py-3 text-rose-600 font-semibold whitespace-nowrap">${displayRetiro}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.obsRenuncia || 'N/A'}</td>
+                    <td class="px-6 py-3"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700">${item.status || 'RETIRADO'}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exportarRetirosExcel() {
+            if(currentRetFiltered.length === 0) {
+                alert("No hay datos de retiros para exportar.");
+                return;
+            }
+            let dataToExport = currentRetFiltered.map(item => ({
+                "DOCUMENTO": item.id,
+                "NOMBRE COMPLETO": item.name,
+                "CARGO": item.cargo,
+                "ÁREA": item.area,
+                "CIUDAD": item.city,
+                "FECHA INGRESO": item.date ? item.date.split(' ')[0] : '',
+                "FECHA RENUNCIA (RETIRO)": item.fechaRenuncia ? item.fechaRenuncia.split(' ')[0] : '',
+                "OBSERVACIÓN RENUNCIA": item.obsRenuncia,
+                "ESTADO": item.status
+            }));
+            exportarExcelProfesional(dataToExport, 'Reporte_Retiros.xlsx');
         }
 
         function initDropdowns() {
@@ -1563,7 +1820,7 @@
             document.getElementById('dynamicCount').textContent = `Mostrando ${data.length} de ${rawData.length} registros`;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No se encontraron registros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="px-6 py-8 text-center text-slate-400">No se encontraron registros.</td></tr>`;
                 return;
             }
 
@@ -1573,6 +1830,9 @@
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
                 let displayDate = item.date ? item.date.split(' ')[0] : 'N/A';
+                let displayUltContrato = item.fechaUltimoContrato ? item.fechaUltimoContrato.split(' ')[0] : 'N/A';
+                let displayRenuncia = item.fechaRenuncia ? item.fechaRenuncia.split(' ')[0] : 'N/A';
+
                 tr.innerHTML = `
                     <td class="px-6 py-3 font-medium text-slate-900">${item.id}</td>
                     <td class="px-6 py-3 font-semibold text-slate-800">${item.name}</td>
@@ -1580,6 +1840,9 @@
                     <td class="px-6 py-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">${item.area || 'N/A'}</span></td>
                     <td class="px-6 py-3 text-slate-600">${item.city || 'N/A'}</td>
                     <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayDate}</td>
+                    <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayUltContrato}</td>
+                    <td class="px-6 py-3 text-slate-600 whitespace-nowrap">${displayRenuncia}</td>
+                    <td class="px-6 py-3 text-slate-600">${item.obsRenuncia || 'N/A'}</td>
                     <td class="px-6 py-3">
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide ${item.status.toUpperCase() === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}">
                             ${item.status || 'N/D'}
@@ -1599,28 +1862,27 @@
             if (format === 'pdf') {
                 window.print();
             } else if (format === 'excel') {
-                let csvRows = [];
-                csvRows.push(['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(','));
-                currentDynamicFiltered.forEach(item => {
-                    csvRows.push([
-                        `"${item.id}"`,
-                        `"${(item.name || '').replace(/"/g, '""')}"`,
-                        `"${(item.cargo || '').replace(/"/g, '""')}"`,
-                        `"${(item.area || '').replace(/"/g, '""')}"`,
-                        `"${(item.city || '').replace(/"/g, '""')}"`,
-                        `"${item.date ? item.date.split(' ')[0] : ''}"`,
-                        `"${item.status}"`
-                    ].join(','));
-                });
-                downloadBlob(csvRows, 'Reporte_Filtros_Dinamicos.csv');
+                let dataToExport = currentDynamicFiltered.map(item => ({
+                    "DOCUMENTO": item.id,
+                    "NOMBRE COMPLETO": item.name,
+                    "CARGO": item.cargo,
+                    "ÁREA": item.area,
+                    "CIUDAD": item.city,
+                    "FECHA INGRESO": item.date ? item.date.split(' ')[0] : '',
+                    "FECHA ÚLTIMO CONTRATO": item.fechaUltimoContrato ? item.fechaUltimoContrato.split(' ')[0] : '',
+                    "FECHA RENUNCIA": item.fechaRenuncia ? item.fechaRenuncia.split(' ')[0] : '',
+                    "OBSERVACIÓN RENUNCIA": item.obsRenuncia,
+                    "ESTADO": item.status
+                }));
+                exportarExcelProfesional(dataToExport, 'Reporte_Filtro_Personal.xlsx');
             } else if (format === 'word') {
                 let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head><meta charset='utf-8'><title>Reporte Word</title></head><body>
                 <h2>Reporte de Colaboradores</h2>
                 <table border='1' cellspacing='0' cellpadding='5'>
-                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Ingreso</th><th>Estado</th></tr>`;
+                <tr style='background:#f2f2f2;'><th>Documento</th><th>Nombre</th><th>Cargo</th><th>Área</th><th>Ciudad</th><th>Ingreso</th><th>Último Contrato</th><th>Fecha Renuncia</th><th>Obs. Renuncia</th><th>Estado</th></tr>`;
                 currentDynamicFiltered.forEach(item => {
-                    htmlContent += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.cargo}</td><td>${item.area}</td><td>${item.city}</td><td>${item.date}</td><td>${item.status}</td></tr>`;
+                    htmlContent += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.cargo}</td><td>${item.area}</td><td>${item.city}</td><td>${item.date}</td><td>${item.fechaUltimoContrato}</td><td>${item.fechaRenuncia}</td><td>${item.obsRenuncia}</td><td>${item.status}</td></tr>`;
                 });
                 htmlContent += `</table></body></html>`;
 
@@ -1697,13 +1959,17 @@
                 return;
             }
             let currentYear = new Date().getFullYear();
-            let csvRows = [['NOMBRE COMPLETO', 'FECHA CUMPLEAÑOS', 'CARGO', 'AREA'].join(',')];
-            currentBDayFiltered.forEach(item => {
+            let dataToExport = currentBDayFiltered.map(item => {
                 let std = parseDateStandard(item.bday);
                 let [, m, d] = std.split('-');
-                csvRows.push([`"${item.name}"`, `"${d}/${m}/${currentYear}"`, `"${item.cargo}"`, `"${item.area}"`].join(','));
+                return {
+                    "NOMBRE COMPLETO": item.name,
+                    "FECHA CUMPLEAÑOS": `${d}/${m}/${currentYear}`,
+                    "CARGO": item.cargo,
+                    "ÁREA": item.area
+                };
             });
-            downloadBlob(csvRows, 'Cumpleanos.csv');
+            exportarExcelProfesional(dataToExport, 'Cumpleanos.xlsx');
         }
 
         function renderListadoGeneralActivos() {
@@ -1738,11 +2004,16 @@
 
         function exportarListadoGeneralExcel() {
             const activos = rawData.filter(i => i.status.toUpperCase() === 'ACTIVO');
-            let csvRows = [['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(',')];
-            activos.forEach(item => {
-                csvRows.push([`"${item.id}"`, `"${item.name}"`, `"${item.cargo}"`, `"${item.area}"`, `"${item.city}"`, `"${item.date}"`, `"${item.status}"`].join(','));
-            });
-            downloadBlob(csvRows, 'Listado_General.csv');
+            let dataToExport = activos.map(item => ({
+                "DOCUMENTO": item.id,
+                "NOMBRE COMPLETO": item.name,
+                "CARGO": item.cargo,
+                "ÁREA": item.area,
+                "CIUDAD": item.city,
+                "FECHA INGRESO": item.date ? item.date.split(' ')[0] : '',
+                "ESTADO": item.status
+            }));
+            exportarExcelProfesional(dataToExport, 'Listado_General.xlsx');
         }
 
         function previsualizarExportacion() {
@@ -1802,23 +2073,45 @@
 
         function ejecutarExportacionCSV() {
             if (currentExportFiltered.length === 0) return;
-            let csvRows = [['DOCUMENTO', 'NOMBRE COMPLETO', 'CARGO', 'AREA', 'CIUDAD', 'FECHA INGRESO', 'ESTADO'].join(',')];
-            currentExportFiltered.forEach(item => {
-                csvRows.z = item; // placeholder context dummy update
-                csvRows.push([`"${item.id}"`, `"${item.name}"`, `"${item.cargo}"`, `"${item.area}"`, `"${item.city}"`, `"${item.date}"`, `"${item.status}"`].join(','));
-            });
-            downloadBlob(csvRows, 'Reporte_Exportacion.csv');
+            let dataToExport = currentExportFiltered.map(item => ({
+                "DOCUMENTO": item.id,
+                "NOMBRE COMPLETO": item.name,
+                "CARGO": item.cargo,
+                "ÁREA": item.area,
+                "CIUDAD": item.city,
+                "FECHA INGRESO": item.date ? item.date.split(' ')[0] : '',
+                "ESTADO": item.status
+            }));
+            exportarExcelProfesional(dataToExport, 'Reporte_Contratacion.xlsx');
         }
 
-        function downloadBlob(rowsArray, filename) {
-            let csvBlob = new Blob(["\ufeff" + rowsArray.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            let url = URL.createObjectURL(csvBlob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        // MOTOR DE EXPORTACIÓN PROFESIONAL A EXCEL CON CELDAS Y AJUSTE DE TEXTO (TEXT WRAP)
+        function exportarExcelProfesional(dataArray, filename) {
+            const worksheet = XLSX.utils.json_to_sheet(dataArray);
+
+            const colWidths = [];
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                let maxWidth = 10;
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    const cellAddress = XLSX.utils.encode_cell({ c: C, r: R });
+                    const cell = worksheet[cellAddress];
+                    if (cell && cell.v != null) {
+                        const cellLength = String(cell.v).length;
+                        if (cellLength > maxWidth) maxWidth = cellLength;
+
+                        if (!cell.s) cell.s = {};
+                        cell.s.alignment = { wrapText: true, vertical: "center" };
+                    }
+                }
+                colWidths[C] = { wch: Math.min(Math.max(maxWidth + 3, 12), 45) };
+            }
+            worksheet['!cols'] = colWidths;
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+            XLSX.writeFile(workbook, filename);
         }
     </script>
 </body>
