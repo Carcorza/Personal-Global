@@ -6,9 +6,9 @@
     <title>Dashboard General de Personal - Talento Humano</title>
     
     <!-- CONFIGURACIÓN DE ICONOS PARA MÓVILES Y PWA -->
-    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8">
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Talento%20Humano%22%2C%22short_name%22%3A%22Talento%20Humano%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Flh3.googleusercontent.com%2Fd%2F1MjgNe-zgyiBPShxkwT5053JND1hc4jY8%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej">
+    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Talento%20Humano%22%2C%22short_name%22%3A%22Talento%20Humano%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Flh3.googleusercontent.com%2Fd%2F1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Talento Humano">
@@ -18,7 +18,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (XLSX) para exportar a Excel en formato de celdas real con ajuste de texto -->
+    <!-- SheetJS (XLSX) para exportar a Excel en formato real -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-6 border border-slate-100">
             <div class="flex flex-col items-center text-center">
                 <div class="bg-white rounded-2xl p-2 shadow-inner mb-3 w-20 h-20 flex items-center justify-center border border-slate-100 overflow-hidden">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                    <img src="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <h1 class="text-xl font-bold text-slate-900">Talento Humano</h1>
                 <p class="text-xs text-slate-500 mt-1">Inicia sesión con tus credenciales autorizadas</p>
@@ -143,7 +143,7 @@
     <!-- Pantalla de Carga Inicial -->
     <div id="loadingOverlay" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center hidden">
         <div class="w-24 h-24 rounded-2xl bg-white shadow-md flex items-center justify-center p-2 mb-4 overflow-hidden animate-pulse border border-slate-100">
-            <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo Empresa" class="w-full h-full object-contain">
+            <img src="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej" alt="Logo Empresa" class="w-full h-full object-contain">
         </div>
         <h3 class="text-xl font-bold text-slate-800">Cargando Dashboard...</h3>
         <p class="text-xs text-slate-500 mt-1">Sincronizando información de personal, por favor espere.</p>
@@ -154,7 +154,7 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="bg-white rounded-xl shadow-sm flex items-center justify-center w-9 h-9 shrink-0 overflow-hidden p-1">
-                    <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                    <img src="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <div>
                     <h1 class="text-white font-bold text-sm tracking-tight">Talento Humano</h1>
@@ -178,7 +178,7 @@
             <div class="p-6">
                 <div class="flex items-center gap-3 mb-8">
                     <div class="bg-white rounded-xl shadow-sm flex items-center justify-center w-10 h-10 shrink-0 overflow-hidden p-1">
-                        <img src="https://lh3.googleusercontent.com/d/1MjgNe-zgyiBPShxkwT5053JND1hc4jY8" alt="Logo" class="w-full h-full object-contain">
+                        <img src="https://lh3.googleusercontent.com/d/1Z8zWfdiK3-gM2HyuCeI-u-vAfxsCgeej" alt="Logo" class="w-full h-full object-contain">
                     </div>
                     <div>
                         <h1 class="text-white font-bold text-sm">Talento Humano</h1>
@@ -335,13 +335,13 @@
                     </div>
                 </div>
 
-                <!-- NUEVA PESTAÑA: INFORMACIÓN PERSONAL (ESTILO FORMULARIO COMPLETO DE CUADROS AZULES) -->
+                <!-- PESTAÑA: INFORMACIÓN PERSONAL -->
                 <div id="content-info-personal" class="tab-content space-y-6">
                     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <h3 class="font-bold text-slate-800 text-base">Ficha Detallada del Funcionario</h3>
-                                <p class="text-xs text-slate-500">Busca por número de cédula o por cualquier parte del nombre (ej. iniciales ou apellidos) para ver toda la ficha en formato de cuadros.</p>
+                                <p class="text-xs text-slate-500">Busca por número de cédula o por cualquier parte del nombre (ej. iniciales o apellidos) para ver toda la ficha en formato de cuadros.</p>
                             </div>
                             <div class="flex items-center gap-2 w-full md:w-auto">
                                 <input type="text" id="searchInfoInput" placeholder="Cédula o parte del nombre..." class="text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full md:w-80" onkeydown="if(event.key === 'Enter') buscarInformacionPersonal()">
@@ -352,7 +352,6 @@
                         </div>
                     </div>
 
-                    <!-- Contenedor del Formulario Ficha -->
                     <div id="infoPersonalResultContainer" class="space-y-6">
                         <div class="bg-white p-12 rounded-xl border border-slate-200 shadow-sm text-center text-slate-400">
                             Por favor ingresa una cédula o nombre en el buscador superior y presiona Buscar para ver la ficha completa.
@@ -398,7 +397,7 @@
                     </div>
                 </div>
 
-                <!-- PESTAÑA 4: LISTADO GENERAL -->
+                <!-- PESTAÑA: LISTADO GENERAL -->
                 <div id="content-table" class="tab-content space-y-6">
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4">
@@ -468,7 +467,7 @@
                                 <h3 class="font-semibold text-slate-800 text-sm">Vista Previa de Registros a Contratación</h3>
                                 <span id="previewCount" class="text-xs text-slate-500 font-medium">0 registros</span>
                             </div>
-                            <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
+                            <button id="btnRealizarExport" onclick="ejecutarExportacionCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition shadow-sm opacity-50 cursor-not-allowed" disabled>
                                 📥 Descargar Excel Profesional
                             </button>
                         </div>
@@ -596,10 +595,6 @@
 
     <script>
         const sheetID = '1pCFrPSBBh3yxhiBE13GXHUyHADCWH9IG01Wkk7hs-mU';
-        
-        // ==========================================
-        // PEGA AQUÍ LA URL DE TU WEB APP DE APPS SCRIPT
-        // ==========================================
         const appsScriptURL = 'https://script.google.com/macros/s/AKfycbwXoixFi07-aesobxOfS6Fq5HX4SqnLyYZdxXjTTHDwxrUYNiqIlgF-OxPHTknpcusi/exec';
 
         let rawData = [];
@@ -619,7 +614,7 @@
         const tabMapping = [
             { id: 'dashboard', name: 'Vista General', icon: '📊', possibleCols: ['VISTA GENERAL', 'VISTAGENERAL'] },
             { id: 'filters', name: 'Filtro Personal', icon: '🔍', possibleCols: ['FILTRO PERSONAL', 'FILTROS DINAMICOS', 'FILTROS DINÁMICOS', 'FILTROS'] },
-            { id: 'info-personal', name: 'Información Personal', icon: '📇', possibleCols: ['INFORMACION PERSONAL', 'INFORMACIÓN PERSONAL', 'INFO PERSONAL'] },
+            { id: 'info-personal', name: 'Información Personal', icon: '📇', possibleCols: ['INF_PERSONAL', 'INFORMACION PERSONAL', 'INFORMACIÓN PERSONAL', 'INFO PERSONAL'] },
             { id: 'pendientes', name: 'Personal Pendiente', icon: '📈', possibleCols: ['PERSONAL PENDIENTE', 'PENDIENTES', 'P_PEND', 'VISTAGENERAL'] },
             { id: 'table', name: 'Listado General', icon: '📋', possibleCols: ['LISTADO GENERAL', 'LISTADOGENERAL'] },
             { id: 'export', name: 'Módulo de Contratación', icon: '📥', possibleCols: ['MODULO CONTRATACION', 'MODULO CONTRATACIÓN', 'MODULO EXPORTACION', 'MODULO EXPORTACIÓN', 'EXPORTAR', 'EXPORTACIÓN'] },
@@ -956,9 +951,10 @@
             tabMapping.forEach(tab => {
                 let tienePermiso = false;
                 tab.possibleCols.forEach(cName => {
-                    let val1 = (permisosActuales[cName] || '').toUpperCase();
-                    let val2 = (permisosActuales[cName.normalize("NFD").replace(/[\u0300-\u036f]/g, "")] || '').toUpperCase();
-                    if(val1 === 'SI' || val2 === 'SI' || tab.id === 'info-personal') {
+                    let val1 = (permisosActuales[cName] || '').toUpperCase().trim();
+                    let cleanColName = cName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+                    let val2 = (permisosActuales[cleanColName] || '').toUpperCase().trim();
+                    if(val1 === 'SI' || val2 === 'SI') {
                         tienePermiso = true;
                     }
                 });
@@ -1115,16 +1111,14 @@
             }
         };
 
-        // FUNCIÓN AUXILIAR PARA FORMATEAR FECHAS A dd/mm/yyyy
         function formatearFechaDDMMYYYY(fechaStr) {
             if (!fechaStr || fechaStr === "No asignado") return fechaStr;
             let std = parseDateStandard(fechaStr);
-            if (!std) return fechaStr; // Si no es fecha reconocida, retorna tal cual
+            if (!std) return fechaStr;
             let [y, m, d] = std.split('-');
             return `${d}/${m}/${y}`;
         }
 
-        // LÓGICA DE BÚSQUEDA Y FORMULARIO TIPO CUADROS AZULES PARA INFORMACIÓN PERSONAL
         function buscarInformacionPersonal() {
             const query = document.getElementById('searchInfoInput').value.trim();
             const container = document.getElementById('infoPersonalResultContainer');
@@ -1148,7 +1142,6 @@
 
             resultados.forEach(item => {
                 let orig = item.original; 
-                
                 let card = document.createElement('div');
                 card.className = "bg-slate-200 p-6 rounded-2xl border border-slate-300 shadow-lg space-y-3 font-sans";
                 
@@ -1156,14 +1149,11 @@
                 
                 for(let key in orig) {
                     let val = orig[key] !== "" ? orig[key] : "";
-                    
-                    // Si el nombre de la columna indica fecha, la formateamos a dd/mm/yyyy
                     let upperKey = key.toUpperCase();
                     if(upperKey.includes("FECHA") || upperKey.includes("F.") || upperKey.includes("NACE") || upperKey.includes("CUMPLE")) {
                         val = formatearFechaDDMMYYYY(val);
                     }
 
-                    // Determinamos un ancho dinámico en columnas de Tailwind (span de 1 a 12) según la longitud de la celda
                     let colSpan = "col-span-1 sm:col-span-2 md:col-span-3";
                     if(upperKey.includes("NOMBRE") || upperKey.includes("CORREO") || upperKey.includes("OBSERVACION") || upperKey.includes("DIRECCION")) {
                         colSpan = "col-span-1 sm:col-span-4 md:col-span-4 lg:col-span-6";
@@ -2107,7 +2097,6 @@
             exportarExcelProfesional(dataToExport, 'Reporte_Contratacion.xlsx');
         }
 
-        // MOTOR DE EXPORTACIÓN PROFESIONAL A EXCEL CON CELDAS Y AJUSTE DE TEXTO (TEXT WRAP)
         function exportarExcelProfesional(dataArray, filename) {
             const worksheet = XLSX.utils.json_to_sheet(dataArray);
 
